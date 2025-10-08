@@ -19,7 +19,7 @@ void yyerror(const char *s);
 
 %token <doubleValue> NUM CHAR
 %token <strValue> VAR_NAME VAR_TYPE
-%token SEMI ";" EQUAL "="
+%token SEMI ";" ATTR "="
 
 %type <node> decl stmt
 %type <node> var_decl var_update
@@ -28,10 +28,15 @@ void yyerror(const char *s);
 
 /* Operadores Condicionais*/
 %token IF ELSE
-%token EQ "==" NE "!=" LT "<" GT ">" LE "<=" GE ">="
 
 /* Operações */
-%token PLUS "+" MINUS "-" TIMES "*" DIVIDE "/" MOD "%"
+%token PLUS "+" MINUS "-" 
+%token TIMES "*" DIVIDE "/" MOD "%"
+
+/* Operações lógicas */
+%token EQ "==" NE "!="
+%token LT "<" GT ">" LE "<=" GE ">="
+%token AND "&&" OR "||" NOT "!"
 
 /* Operadores unarios*/
 %token INCR "++" DECR "--"
@@ -39,11 +44,14 @@ void yyerror(const char *s);
 %token LPAREN "(" RPAREN ")"
 %token LBRACK "{" RBRACK "}"
 
-/* Precedência e associatividade */
+/* Precedência e associatividade */ 
 %left PLUS MINUS
 %left TIMES DIVIDE MOD
-%right UMINUS   /* ex: -5 */
-%right INCR DECR   /* ++ e -- associativos a direita */
+%left EQ NE
+%left LT GT LE GE
+%left AND OR
+%right INCR DECR
+%right NOT
 
 %start program
 
@@ -53,6 +61,7 @@ program:
        | program stmt     { exec_node($2); free_node($2); }
        | program decl     { exec_node($2); free_node($2); }
        | program scope    { exec_node($2); free_node($2); }
+       | program expr     { exec_node($2); free_node($2); }
        ;
 
 scope: "{"         { $<node>list = current_list; 
@@ -97,21 +106,29 @@ var_update: VAR_NAME[name] "=" expr ";" {
           ;
 
 expr:
-      NUM            { $$ = create_expr_node(EXPR_NUM, &$1, NULL, NULL); }
-    | CHAR           { $$ = create_expr_node(EXPR_CHAR, &$1, NULL, NULL); }
-    | VAR_NAME       { $$ = create_expr_node(EXPR_VAR, $1, NULL, NULL); }
-    | expr "+" expr  { $$ = create_expr_node(EXPR_PLUS, NULL, $1, $3); }
-    | expr "-" expr  { $$ = create_expr_node(EXPR_MINUS, NULL, $1, $3); }
+      "(" expr ")"   { $$ = create_expr_node(EXPR_PAR, NULL, $2, NULL); }
+    | VAR_NAME "++"  { $$ = create_expr_node(EXPR_INC_POST, $1, NULL, NULL); }   /* x++ */
+    | VAR_NAME "--"  { $$ = create_expr_node(EXPR_DEC_POST, $1, NULL, NULL); }   /* x-- */
+    | "++" VAR_NAME  { $$ = create_expr_node(EXPR_INC_PREV, $2, NULL, NULL); }   /* ++x */
+    | "--" VAR_NAME  { $$ = create_expr_node(EXPR_DEC_PREV, $2, NULL, NULL); }   /* --x */
+    | "-" expr       { $$ = create_expr_node(EXPR_NEG, NULL, $2, NULL); }
+    | "!" expr       { $$ = create_expr_node(EXPR_NOT, NULL, $2, NULL); }
     | expr "*" expr  { $$ = create_expr_node(EXPR_TIMES, NULL, $1, $3); }
     | expr "/" expr  { $$ = create_expr_node(EXPR_DIV, NULL, $1, $3); }
     | expr "%" expr  { $$ = create_expr_node(EXPR_MOD, NULL, $1, $3); }
-    | expr error expr{ exit_with_error(UNKNOWN_OPERATION); }
-    | "(" expr ")"   { $$ = create_expr_node(EXPR_PAR, NULL, $2, NULL); }
-    | MINUS expr     { $$ = create_expr_node(EXPR_NEG, NULL, $2, NULL); }
-    | "++" VAR_NAME  { $$ = create_expr_node(EXPR_INC_PREV, $2, NULL, NULL); }   /* ++x */
-    | "--" VAR_NAME  { $$ = create_expr_node(EXPR_DEC_PREV, $2, NULL, NULL); }   /* --x */
-    | VAR_NAME "++"  { $$ = create_expr_node(EXPR_INC_POST, $1, NULL, NULL); }   /* x++ */
-    | VAR_NAME "--"  { $$ = create_expr_node(EXPR_DEC_POST, $1, NULL, NULL); }   /* x-- */
+    | expr "<" expr  { $$ = create_expr_node(EXPR_LT, NULL, $1, $3); }
+    | expr ">" expr  { $$ = create_expr_node(EXPR_GT, NULL, $1, $3); }
+    | expr "<=" expr { $$ = create_expr_node(EXPR_LE, NULL, $1, $3); }
+    | expr ">=" expr { $$ = create_expr_node(EXPR_GE, NULL, $1, $3); }
+    | expr "==" expr { $$ = create_expr_node(EXPR_EQUAL, NULL, $1, $3); }
+    | expr "!=" expr { $$ = create_expr_node(EXPR_NEQUAL, NULL, $1, $3); }
+    | expr "&&" expr { $$ = create_expr_node(EXPR_AND, NULL, $1, $3); }
+    | expr "||" expr { $$ = create_expr_node(EXPR_OR, NULL, $1, $3); }
+    | expr "+" expr  { $$ = create_expr_node(EXPR_PLUS, NULL, $1, $3); }
+    | expr "-" expr  { $$ = create_expr_node(EXPR_MINUS, NULL, $1, $3); }
+    | NUM            { $$ = create_expr_node(EXPR_NUM, &$1, NULL, NULL); }
+    | CHAR           { $$ = create_expr_node(EXPR_CHAR, &$1, NULL, NULL); }
+    | VAR_NAME       { $$ = create_expr_node(EXPR_VAR, $1, NULL, NULL); }
     | error          { exit_with_error(UNKNOWN_SYMBOL); }
     ;
 

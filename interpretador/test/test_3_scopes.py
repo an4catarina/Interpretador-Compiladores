@@ -1,17 +1,12 @@
 from common import *
 
-test_files = glob(f"{tests_path}/var/*.c")
+test_files = glob(f"{tests_path}/scopes/*.c")
 test_files = sorted(list(test_files))
-expected_return_code = [1, 1, 0, 0, 0, 0, 0, 0]
+expected_return_code = [1, 0, 0]
 expected_output = [
-    "Uso de variável desconhecida m na linha 2",
-    "Uso de variável desconhecida string na linha",
+    "[ERRO] Uso de variável desconhecida m na linha 9",
     "",
     "",
-    ["Variável: c", "Tipo: char", "Valor: 'A'"],
-    ["Variável: d", "Tipo: double", "Valor: 3.141500"],
-    ["Variável: f", "Tipo: float", "Valor: 2.5000"],
-    ["Variável: i", "Tipo: int", "Valor: 10"],
 ]
 
 
