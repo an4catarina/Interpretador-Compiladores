@@ -1,24 +1,23 @@
-import pytest           
-import subprocess
-from glob import glob
 from common import *
 
 
-test_files = sorted(glob("test/cases/if_else/*.c"))
+test_files = glob(f"{tests_path}/if_else/*.c")
+test_files = sorted(list(test_files))
 
 # Retorno esperado (0 = sucesso, 1 = erro)
 expected_return_code = [0, 0, 0, 0, 0, 0, 1]
 
 # Saídas esperadas (stdout ou stderr)
 expected_output = [
-    ["Variável: x", "Valor: 15"],   # 01_if_simples_verdadeiro
-    ["Variável: x", "Valor: -5"],   # 02_if_simples_falso
-    ["Variável: x", "Valor: -8"],   # 03_if_else
-    ["Variável: x", "Valor: 2"],    # 04_else_if
-    ["Variável: x", "Valor: 8"],    # 05_if_aninhado
-    ["Variável: a", "Valor: 12"],   # 06_if_complexo
-    "Sintaxe inválida",             # 07_if_invalido
+    ["Variável: x", "Valor: 15"],  # 01_if_simples_verdadeiro
+    ["Variável: x", "Valor: -5"],  # 02_if_simples_falso
+    ["Variável: x", "Valor: -8"],  # 03_if_else
+    ["Variável: x", "Valor: 2"],  # 04_else_if
+    ["Variável: x", "Valor: 8"],  # 05_if_aninhado
+    ["Variável: a", "Valor: 12"],  # 06_if_complexo
+    "Sintaxe inválida",  # 07_if_invalido
 ]
+
 
 class TestIfElse:
     @pytest.mark.parametrize(
