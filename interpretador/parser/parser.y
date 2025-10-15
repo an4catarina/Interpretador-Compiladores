@@ -36,6 +36,9 @@ void yyerror(const char *s);
 %token LBRACK "{" RBRACK "}"
 %type <node> body
 
+%token WHILE
+%token DO
+
 /* Precedência e associatividade */
 %left PLUS MINUS
 %left TIMES DIVIDE MOD

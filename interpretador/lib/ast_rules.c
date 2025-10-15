@@ -186,16 +186,16 @@ double exec_node_list(ListNode *node) {
 
 static int to_bool(double v) { return v != 0.0; }
 
-void exec_while_node(struct ASTNode* node) {
+void exec_while_node(ASTNode* node) {
   WhileNode* w = (WhileNode*)node->data;
-  while (to_bool(exec_expr_node(w->condition))) {
-    exec_node_list(w->body);
+  while (to_bool(exec_node(w->condition))) {
+    exec_node(w->body);
   }
 }
 
-void exec_do_while_node(struct ASTNode* node) {
+void exec_do_while_node(ASTNode* node) {
   DoWhileNode* d = (DoWhileNode*)node->data;
   do {
-    exec_node_list(d->body);
-  } while (to_bool(exec_expr_node(d->condition)));
+    exec_node(d->body);
+  } while (to_bool(exec_node(d->condition)));
 }

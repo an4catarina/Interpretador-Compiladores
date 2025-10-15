@@ -144,7 +144,7 @@ void free_list_node(ASTNode *node) {
   free(node);
 }
 
-struct ASTNode *create_while_node(ASTNode *condition, ASTNode *body) {
+ASTNode *create_while_node(ASTNode *condition, ASTNode *body) {
   ASTNode *node = malloc(sizeof(ASTNode));
   node->type = NODE_WHILE;
   WhileNode *w = malloc(sizeof(WhileNode));
@@ -163,7 +163,7 @@ void free_while_node(ASTNode *node) {
   }
 }
 
-struct ASTNode *create_do_while_node(ASTNode *body, ASTNode *condition) {
+ASTNode *create_do_while_node(ASTNode *body, ASTNode *condition) {
   ASTNode *node = malloc(sizeof(ASTNode));
   node->type = NODE_DO_WHILE;
   DoWhileNode *dw = malloc(sizeof(DoWhileNode));
