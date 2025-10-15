@@ -2,7 +2,6 @@
 #include "ast_nodes.h"
 #include "ast_rules.h"
 #include "meta.h"
-#include "scope.h"
 #include "utils.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -79,6 +78,6 @@ void free_node(ASTNode *node) {
   if (type == NODE_LIST)
     free_list_node(node);
 
-   if (type == IF_STMT)
+  if (type == IF_STMT)
     free_if_node(node);
 }

@@ -7,8 +7,8 @@ expected_output = [
     ["[DEBUG] Valor: 12", "[DEBUG] Valor: 47.000000"],
     ["[DEBUG] Valor: 12", "[DEBUG] Valor: 'B'", "[DEBUG] Valor: 78.000000"],
     "[DEBUG] Valor: 754.500000",
-    "[ERRO] Operação desconhecida",
-    "[ERRO] Símbolo desconhecido",
+    "[ERRO] Símbolo ou operação desconhecidos",
+    "[ERRO] Símbolo ou operação desconhecidos",
 ]
 
 

@@ -1,2 +1,2 @@
 // Falha
-string s;
+string s = "Hello";

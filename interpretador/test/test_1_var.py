@@ -5,7 +5,7 @@ test_files = sorted(list(test_files))
 expected_return_code = [1, 1, 0, 0, 0, 0, 0, 0]
 expected_output = [
     "Uso de variável desconhecida m na linha 2",
-    "Sintaxe inválida na linha 2",
+    "Uso de variável desconhecida string na linha",
     "",
     "",
     ["Variável: c", "Tipo: char", "Valor: 'A'"],

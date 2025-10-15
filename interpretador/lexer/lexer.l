@@ -18,7 +18,7 @@ AL  [_a-zA-Z]
 
 ";" { return SEMI; }
 
-"=" { return EQUAL; }
+"=" { return ATTR; }
 
 "+"             { return PLUS; }
 "-"             { return MINUS; }
@@ -41,6 +41,9 @@ AL  [_a-zA-Z]
 ">"             { return GT; }
 "<="            { return LE; }
 ">="            { return GE; }
+"&&"            { return AND; }
+"||"            { return OR; }
+"!"             { return NOT; }
 
 ("int"|"float"|"double"|"char") {
     yylval.strValue = strdup(yytext);

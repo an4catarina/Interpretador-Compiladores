@@ -10,11 +10,8 @@ void exit_with_error(const ErrorType e) {
   case INIT_INVALID_TYPE:
     fprintf(stderr, "[ERRO] Inicialização de variável de tipo inválido\n");
     break;
-  case UNKNOWN_OPERATION:
-    fprintf(stderr, "[ERRO] Operação desconhecida\n");
-    break;
   case UNKNOWN_SYMBOL:
-    fprintf(stderr, "[ERRO] Símbolo desconhecido\n");
+    fprintf(stderr, "[ERRO] Símbolo ou operação desconhecidos\n");
     break;
   default:
     break;
