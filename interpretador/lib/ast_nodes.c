@@ -77,17 +77,18 @@ ASTNode *create_expr_node(NodeType type, void *value, ASTNode *left,
 void free_expr_node(ASTNode *node) {
   ExprNode *data = node->data;
 
-  if (data->left_expr != NULL)
-    free_expr_node(data->left_expr);
+  if (data) {
+    if (data->left_expr)
+      free_expr_node(data->left_expr);
 
-  if (data->right_expr != NULL)
-    free_expr_node(data->right_expr);
+    if (data->right_expr)
+      free_expr_node(data->right_expr);
 
-  if (data->value != NULL)
-    free(data->value);
+    if (data->value)
+      free(data->value);
 
-  free(node->data);
-  free(node);
+    free(data);
+  }
 }
 
 ASTNode *create_node_list() {

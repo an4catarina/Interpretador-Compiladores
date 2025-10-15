@@ -2,11 +2,14 @@ from common import *
 
 test_files = glob(f"{tests_path}/expr/*.c")
 test_files = sorted(list(test_files))
-expected_return_code = [0, 0, 0, 1, 1]
+expected_return_code = [0, 0, 0, 0, 0, 0, 1, 1]
 expected_output = [
-    ["[DEBUG] Valor: 12", "[DEBUG] Valor: 47.000000"],
-    ["[DEBUG] Valor: 12", "[DEBUG] Valor: 'B'", "[DEBUG] Valor: 78.000000"],
-    "[DEBUG] Valor: 754.500000",
+    ["Valor: 12", "Valor: 47.000000"],
+    ["Valor: 12", "Valor: 'B'", "Valor: 78.000000"],
+    ["Valor: 0", "Valor: 10", "Valor: 20", "Valor: 31"],
+    ["Valor: 1", "Valor: 11", "Valor: 21", "Valor: 31", "Valor: 40", "Valor: 50"],
+    ["Valor: 0", "Valor: 11", "Valor: 21", "Valor: 31"],
+    "Valor: 754.500000",
     "[ERRO] Símbolo ou operação desconhecidos",
     "[ERRO] Símbolo ou operação desconhecidos",
 ]

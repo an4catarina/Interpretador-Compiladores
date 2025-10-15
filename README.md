@@ -54,7 +54,7 @@ Atualmente foram implementadas as seguintes suítes de testes:
 |  Nome  | Casos de Teste | Funcionalidade testada                                     |
 | :----: | :------------: | :--------------------------------------------------------- |
 |  var   |       8        | Declaração, inicialização e uso de variáveis               |
-|  expr  |       5        | Expressões aritméticas                                     |
+|  expr  |       8        | Expressões aritméticas                                     |
 | scopes |       3        | Criação de escopos, uso de variáveis de escopos diferentes |
 
 ---
