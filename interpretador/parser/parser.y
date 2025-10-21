@@ -25,9 +25,10 @@ void yyerror(const char *s);
 %type <node> var_decl var_update
 %type <node> scope
 %type <node> expr
+%type <node> if_stmt else_stmt
 
 /* Operadores Condicionais*/
-%token IF ELSE
+%token IF "if" ELSE "else"
 
 /* Operações */
 %token PLUS "+" MINUS "-" 
@@ -82,9 +83,22 @@ inner_scope:
              "}"         { ASTNode *l = current_list;
                            current_list = $<node>list;
                            add_list_node(l); }
+           ;
 
-stmt: VAR_NAME[name] ";" { $$ = create_var_node(VAR_PRINT, NULL, $name, NULL); }
+stmt: VAR_NAME[name] ";" { $$ = create_var_node(VAR_PRINT, NULL, $name, NULL); } 
+    | if_stmt { $$ = $1; }
     ;
+
+if_stmt: "if" "(" expr ")" decl else_stmt  { $$ = create_if_node($3, $5, $6); }
+       | "if" "(" expr ")" stmt else_stmt  { $$ = create_if_node($3, $5, $6); }
+       | "if" "(" expr ")" scope else_stmt { $$ = create_if_node($3, $5, $6); }
+       ;
+
+else_stmt: { $$ = NULL; } 
+         | "else" decl    { $$ = $2; }
+         | "else" stmt    { $$ = $2; }
+         | "else" scope   { $$ = $2; }
+         ;
 
 decl: var_decl   { $$ = $1; }
     | var_update { $$ = $1; }

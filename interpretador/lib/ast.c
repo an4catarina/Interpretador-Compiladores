@@ -61,6 +61,9 @@ double exec_node(ASTNode *node) {
   if (type == NODE_LIST)
     return exec_node_list(node->data);
 
+  if (type == IF_STMT)
+    return exec_if_node(node);
+
   return 0;
 }
 
