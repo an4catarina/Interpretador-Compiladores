@@ -51,11 +51,12 @@ just test var
 
 Atualmente foram implementadas as seguintes suítes de testes:
 
-|  Nome  | Casos de Teste | Funcionalidade testada                                     |
-| :----: | :------------: | :--------------------------------------------------------- |
-|  var   |       8        | Declaração, inicialização e uso de variáveis               |
-|  expr  |       5        | Expressões aritméticas                                     |
-| scopes |       3        | Criação de escopos, uso de variáveis de escopos diferentes |
+|  Nome   | Casos de Teste | Funcionalidade testada                                     |
+| :-----: | :------------: | :--------------------------------------------------------- |
+|   var   |       8        | Declaração, inicialização e uso de variáveis               |
+|  expr   |       8        | Expressões aritméticas                                     |
+| scopes  |       3        | Criação de escopos, uso de variáveis de escopos diferentes |
+| if_else |       7        | Estruturas `if`, `else` e `else if`                        |
 
 ---
 
