@@ -179,7 +179,8 @@ void free_if_node(ASTNode *node) {
 
   free_node(ifn->condition);
   free_node(ifn->if_body);
-  free_node(ifn->else_body);
+  if (ifn->else_body)
+    free_node(ifn->else_body);
 
   free(ifn);
   free(node);

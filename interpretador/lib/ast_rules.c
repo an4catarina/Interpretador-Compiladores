@@ -233,7 +233,7 @@ double exec_if_node(ASTNode *node) {
 
   double condition_result = exec_node(ifn->condition);
 
-  if (condition_result != 0) {
+  if (condition_result) {
     return exec_node(ifn->if_body);
   } else if (ifn->else_body != NULL) {
     return exec_node(ifn->else_body);

@@ -1,9 +1,9 @@
-int x = 0;
-
-if (x > 0) {
-    x = 1;
-} else if (x == 0) {
-    x = 2;
+int x;
+if (0) {
+  x = 1;
+} else if (1) {
+  x = 2;
 } else {
-    x = 3;
+  x = 3;
 }
+x;
