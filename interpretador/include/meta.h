@@ -1,6 +1,6 @@
 #ifndef META_H
 #define META_H
 
-extern int line;
+extern int parser_line;
 
 #endif

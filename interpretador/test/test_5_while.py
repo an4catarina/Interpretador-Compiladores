@@ -11,7 +11,7 @@ expected_output = [
 ]
 
 
-class TestVar:
+class TestWhile:
     @pytest.mark.parametrize(
         "test_file, return_code, output",
         zip(test_files, expected_return_code, expected_output),

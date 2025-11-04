@@ -71,7 +71,9 @@ AL  [_a-zA-Z]
 
 "//".*    { /* Comentário */}
 
-\n        { line++; }
+"int main()" { return MAIN; }
+
+\n        { parser_line++; }
 
 .         { /* printf("Caractere não reconhecido: %s\n", yytext); */ }
 

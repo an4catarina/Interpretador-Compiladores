@@ -1,8 +1,7 @@
 #include "utils.h"
-#include "meta.h"
+#include "error.h"
 #include "var.h"
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 
 double convert_char(char *c) {
@@ -45,7 +44,7 @@ double convert_char(char *c) {
   return value;
 }
 
-void print_var(char *name) {
+void print_var(char *name, int line) {
   Var *var = get_var(name);
   if (var != NULL) {
     VarType type = var->type;
@@ -75,13 +74,11 @@ void print_var(char *name) {
       break;
     }
   } else {
-    fprintf(stderr, "[ERRO] Uso de variável desconhecida %s na linha %d\n",
-            name, line);
-    exit(1);
+    exit_with_error(UNKNOWN_VAR, line);
   }
 }
 
-double get_var_value(char *name) {
+double get_var_value(char *name, int line) {
   Var *var = get_var(name);
   if (var != NULL) {
     VarType type = var->type;
@@ -109,8 +106,6 @@ double get_var_value(char *name) {
 
     return v;
   } else {
-    fprintf(stderr, "[ERRO] Uso de variável desconhecida %s na linha %d\n",
-            name, line);
-    exit(1);
+    exit_with_error(UNKNOWN_VAR, line);
   }
 }

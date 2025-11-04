@@ -2,7 +2,7 @@
 #define UTILS_H
 
 extern double convert_char(char *c);
-extern void print_var(char *name);
-extern double get_var_value(char *name);
+extern void print_var(char *name, int line);
+extern double get_var_value(char *name, int line);
 
 #endif

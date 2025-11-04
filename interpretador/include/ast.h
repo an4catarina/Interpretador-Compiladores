@@ -55,6 +55,7 @@ typedef enum {
 typedef struct {
   NodeType type;
   void *data;
+  int line;
 } ASTNode;
 
 extern double exec_node(ASTNode *node);

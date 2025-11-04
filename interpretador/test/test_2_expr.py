@@ -10,12 +10,12 @@ expected_output = [
     ["Valor: 1", "Valor: 11", "Valor: 21", "Valor: 31", "Valor: 40", "Valor: 50"],
     ["Valor: 0", "Valor: 11", "Valor: 21", "Valor: 31"],
     "Valor: 754.500000",
-    "[ERRO] Símbolo ou operação desconhecidos",
-    "[ERRO] Símbolo ou operação desconhecidos",
+    "[ERRO] Sintaxe inválida na linha 2",
+    "[ERRO] Sintaxe inválida na linha 2",
 ]
 
 
-class TestVar:
+class TestExpr:
     @pytest.mark.parametrize(
         "test_file, return_code, output",
         zip(test_files, expected_return_code, expected_output),

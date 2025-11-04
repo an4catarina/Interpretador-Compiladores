@@ -1,6 +1,7 @@
 #include "ast_rules.h"
 #include "ast.h"
 #include "ast_nodes.h"
+#include "error.h"
 #include "meta.h"
 #include "scope.h"
 #include "utils.h"
@@ -35,7 +36,7 @@ bool exec_var_decl(VarNode *node) {
 bool exec_var_init(VarNode *node) {
   char *type = node->type;
   char *name = node->name;
-  double value = exec_expr_node(node->value->type, node->value->data);
+  double value = exec_expr_node(node->value->type, node->value);
 
   if (strcmp(type, "int") == 0) {
     int i = value;
@@ -62,7 +63,7 @@ bool exec_var_init(VarNode *node) {
 
 bool exec_var_update(VarNode *node) {
   char *name = node->name;
-  double value = exec_expr_node(node->value->type, node->value->data);
+  double value = exec_expr_node(node->value->type, node->value);
 
   VarList *l = current_scope->var_list;
   Var *var = get_var(name);
@@ -91,18 +92,20 @@ bool exec_var_update(VarNode *node) {
   return false;
 }
 
-double exec_expr_node(NodeType type, ExprNode *node) {
+double exec_expr_node(NodeType type, ASTNode *node) {
   double d = 0;
   double l = 0;
   double r = 0;
 
+  ExprNode *expr = node->data;
+
   if (type == EXPR_NUM || type == EXPR_CHAR) {
-    double *n = node->value;
+    double *n = expr->value;
     d = *n;
   } else if (type >= EXPR_PLUS && type <= EXPR_PAR) {
-    l = exec_expr_node(node->left_expr->type, node->left_expr->data);
-    if (node->right_expr != NULL)
-      r = exec_expr_node(node->right_expr->type, node->right_expr->data);
+    l = exec_expr_node(expr->left_expr->type, expr->left_expr);
+    if (expr->right_expr != NULL)
+      r = exec_expr_node(expr->right_expr->type, expr->right_expr);
 
     switch (type) {
     case EXPR_PLUS:
@@ -116,8 +119,7 @@ double exec_expr_node(NodeType type, ExprNode *node) {
       break;
     case EXPR_DIV:
       if (r == 0) {
-        fprintf(stderr, "[ERRO] Divisão por 0 na linha %d\n", line);
-        exit(1);
+        exit_with_error(DIV_BY_ZERO, node->line);
       } else {
         d = l / r;
       }
@@ -130,8 +132,7 @@ double exec_expr_node(NodeType type, ExprNode *node) {
       break;
     case EXPR_MOD:
       if (r == 0 || (long)l != l || (long)r != r) {
-        fprintf(stderr, "[ERRO] Operação de módulo com 0 na linha %d\n", line);
-        exit(1);
+        exit_with_error(MOD_BY_ZERO, node->line);
       } else {
         d = (long)l % (long)r;
       }
@@ -174,8 +175,8 @@ double exec_expr_node(NodeType type, ExprNode *node) {
     }
 
   } else {
-    char *name = node->value;
-    double value = get_var_value(name);
+    char *name = expr->value;
+    double value = get_var_value(name, node->line);
     Var *var = get_var(name);
 
     switch (type) {
@@ -225,20 +226,19 @@ double exec_node_list(ListNode *node) {
 
 static int to_bool(double v) { return v != 0.0; }
 
-void exec_while_node(ASTNode* node) {
-  WhileNode* w = node->data;
+void exec_while_node(ASTNode *node) {
+  WhileNode *w = node->data;
   while (to_bool(exec_node(w->condition))) {
     exec_node(w->body);
   }
 }
 
-void exec_do_while_node(ASTNode* node) {
-  WhileNode* d = node->data;
+void exec_do_while_node(ASTNode *node) {
+  WhileNode *d = node->data;
   do {
     exec_node(d->body);
   } while (to_bool(exec_node(d->condition)));
 }
-
 
 double exec_if_node(ASTNode *node) {
   if (!node || node->type != IF_STMT)

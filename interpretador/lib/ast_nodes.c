@@ -1,5 +1,6 @@
 #include "ast_nodes.h"
 #include "ast.h"
+#include "meta.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -13,6 +14,7 @@ ASTNode *create_var_node(NodeType node_type, char *type, char *name,
 
   node->type = node_type;
   node->data = vn;
+  node->line = parser_line;
 
   if (name != NULL) {
     vn->name = malloc(strlen(name) + 1);
@@ -56,6 +58,7 @@ ASTNode *create_expr_node(NodeType type, void *value, ASTNode *left,
   ASTNode *node = malloc(sizeof(ASTNode));
   node->data = malloc(sizeof(ExprNode));
   node->type = type;
+  node->line = parser_line;
 
   ExprNode *data = node->data;
   data->left_expr = left;
@@ -93,6 +96,7 @@ ASTNode *create_node_list() {
   ASTNode *node = malloc(sizeof(ASTNode));
   node->type = NODE_LIST;
   node->data = malloc(sizeof(ListNode));
+  node->line = parser_line;
 
   ListNode *list = node->data;
   list->node = NULL;
@@ -147,6 +151,7 @@ void free_list_node(ASTNode *node) {
 ASTNode *create_while_node(ASTNode *condition, ASTNode *body, bool is_while) {
   ASTNode *node = malloc(sizeof(ASTNode));
   node->type = is_while ? NODE_WHILE : NODE_DO_WHILE;
+  node->line = parser_line;
 
   WhileNode *w = malloc(sizeof(WhileNode));
   w->condition = condition;
@@ -183,6 +188,7 @@ ASTNode *create_if_node(ASTNode *condition, ASTNode *if_body,
 
   node->type = IF_STMT;
   node->data = ifn;
+  node->line = parser_line;
 
   ifn->condition = condition;
   ifn->if_body = if_body;

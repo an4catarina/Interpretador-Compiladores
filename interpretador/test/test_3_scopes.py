@@ -4,13 +4,13 @@ test_files = glob(f"{tests_path}/scopes/*.c")
 test_files = sorted(list(test_files))
 expected_return_code = [1, 0, 0]
 expected_output = [
-    "[ERRO] Uso de variável desconhecida m na linha 9",
+    "[ERRO] Uso de variável desconhecida na linha 8",
     "",
     "",
 ]
 
 
-class TestVar:
+class TestScopes:
     @pytest.mark.parametrize(
         "test_file, return_code, output",
         zip(test_files, expected_return_code, expected_output),

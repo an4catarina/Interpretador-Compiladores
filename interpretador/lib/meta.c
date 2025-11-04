@@ -1,3 +1,3 @@
 #include "meta.h"
 
-int line = 1;
+int parser_line = 1;

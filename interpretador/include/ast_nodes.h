@@ -14,6 +14,7 @@ typedef struct op {
   ASTNode *left_expr;
   ASTNode *right_expr;
   void *value;
+  int line;
 } ExprNode;
 
 typedef struct list {

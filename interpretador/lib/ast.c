@@ -1,6 +1,7 @@
 #include "ast.h"
 #include "ast_nodes.h"
 #include "ast_rules.h"
+#include "error.h"
 #include "meta.h"
 #include "utils.h"
 #include <stdio.h>
@@ -20,9 +21,7 @@ double exec_node(ASTNode *node) {
       if (exec_var_decl(data)) {
         printf("[DEBUG] Declaração de variável: %s\n", data->name);
       } else {
-        fprintf(stderr, "[ERRO] Redeclaração da variável %s na linha %d\n",
-                data->name, line);
-        exit(1);
+        exit_with_error(VAR_REDECLARATION, node->line);
       }
       break;
 
@@ -30,9 +29,7 @@ double exec_node(ASTNode *node) {
       if (exec_var_init(data)) {
         printf("[DEBUG] Inicializando a variável: %s\n", data->name);
       } else {
-        fprintf(stderr, "[ERRO] Redeclaração da variável %s na linha %d\n",
-                data->name, line);
-        exit(1);
+        exit_with_error(VAR_REDECLARATION, node->line);
       }
       break;
 
@@ -40,14 +37,12 @@ double exec_node(ASTNode *node) {
       if (exec_var_update(data)) {
         printf("[DEBUG] Atualizando valor da variável: %s\n", data->name);
       } else {
-        fprintf(stderr, "[ERRO] Uso de variável desconhecida %s na linha %d\n",
-                data->name, line);
-        exit(1);
+        exit_with_error(UNKNOWN_VAR, node->line);
       }
       break;
 
     case VAR_PRINT:
-      print_var(data->name);
+      print_var(data->name, node->line);
       break;
 
     default:
@@ -56,7 +51,7 @@ double exec_node(ASTNode *node) {
   }
 
   if (type >= EXPR_NUM && type <= EXPR_DEC_POST)
-    return exec_expr_node(node->type, node->data);
+    return exec_expr_node(node->type, node);
 
   if (type == NODE_LIST)
     return exec_node_list(node->data);
