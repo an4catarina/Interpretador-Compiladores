@@ -4,7 +4,6 @@
 typedef enum {
   DECL_INVALID_TYPE,
   INIT_INVALID_TYPE,
-  UNKNOWN_OPERATION,
   UNKNOWN_SYMBOL,
 } ErrorType;
 

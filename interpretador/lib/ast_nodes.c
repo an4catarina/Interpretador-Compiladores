@@ -65,7 +65,8 @@ ASTNode *create_expr_node(NodeType type, void *value, ASTNode *left,
     double *d = value;
     data->value = malloc(sizeof(double));
     memcpy(data->value, value, sizeof(double));
-  } else if (type == EXPR_VAR) {
+  } else if (type == EXPR_VAR ||
+             (type >= EXPR_INC_PREV && type <= EXPR_DEC_POST)) {
     data->value = malloc(strlen(value) + 1);
     memcpy(data->value, value, strlen(value) + 1);
   }
@@ -76,17 +77,16 @@ ASTNode *create_expr_node(NodeType type, void *value, ASTNode *left,
 void free_expr_node(ASTNode *node) {
   ExprNode *data = node->data;
 
-  if (data->left_expr != NULL)
-    free_expr_node(data->left_expr);
+  if (data) {
+    if (data->left_expr != NULL)
+      free_expr_node(data->left_expr);
 
-  if (data->right_expr != NULL)
-    free_expr_node(data->right_expr);
+    if (data->right_expr != NULL)
+      free_expr_node(data->right_expr);
 
-  if (data->value != NULL)
-    free(data->value);
-
-  free(node->data);
-  free(node);
+    if (data->value != NULL)
+      free(data->value);
+  }
 }
 
 ASTNode *create_node_list() {
@@ -180,4 +180,46 @@ void free_do_while_node(ASTNode *node) {
     if (dw->condition) free_node(dw->condition);
     free(dw);
   }
+}
+
+
+ASTNode *create_if_node(ASTNode *condition, ASTNode *if_body,
+                        ASTNode *else_body) {
+  ASTNode *node = malloc(sizeof(ASTNode));
+  if (!node)
+    return NULL;
+
+  ASTNodeIf *ifn = malloc(sizeof(ASTNodeIf));
+  if (!ifn) {
+    free(node);
+    return NULL;
+  }
+
+  node->type = IF_STMT;
+  node->data = ifn;
+
+  ifn->condition = condition;
+  ifn->if_body = if_body;
+  ifn->else_body = else_body;
+
+  return node;
+}
+
+void free_if_node(ASTNode *node) {
+  if (!node)
+    return;
+
+  ASTNodeIf *ifn = (ASTNodeIf *)node->data;
+  if (!ifn) {
+    free(node);
+    return;
+  }
+
+  free_node(ifn->condition);
+  free_node(ifn->if_body);
+  if (ifn->else_body)
+    free_node(ifn->else_body);
+
+  free(ifn);
+  free(node);
 }

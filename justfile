@@ -11,5 +11,6 @@ test cases="test": build
 clean:
     rm -rf {{ build_path }}
 
-run:
-    ./{{ build_path }}/interpretador
+run file="":
+    ./{{ build_path }}/interpretador {{ if file != "" { prepend("< ", file) } else { "" } }} 
+    
