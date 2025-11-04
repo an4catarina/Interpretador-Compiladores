@@ -21,11 +21,12 @@ void yyerror(const char *s);
 %token <strValue> VAR_NAME VAR_TYPE
 %token SEMI ";" ATTR "="
 
-%type <node> decl stmt
+%type <node> decl stmt cond
 %type <node> var_decl var_update
 %type <node> scope
 %type <node> expr
 %type <node> if_stmt else_stmt
+%type <node> while_stmt do_while_stmt
 
 /* Operadores Condicionais*/
 %token IF "if" ELSE "else"
@@ -44,10 +45,9 @@ void yyerror(const char *s);
 
 %token LPAREN "(" RPAREN ")"
 %token LBRACK "{" RBRACK "}"
-%type <node> body
 
-%token WHILE
-%token DO
+%token WHILE "while"
+%token DO "do"
 
 /* Precedência e associatividade */ 
 %left PLUS MINUS
@@ -67,6 +67,7 @@ program:
        | program decl     { exec_node($2); free_node($2); }
        | program scope    { exec_node($2); free_node($2); }
        | program expr     { exec_node($2); free_node($2); }
+       | program cond     { exec_node($2); free_node($2); }
        ;
 
 scope: "{"         { $<node>list = current_list; 
@@ -78,6 +79,7 @@ scope: "{"         { $<node>list = current_list;
 inner_scope:
            | inner_scope stmt { add_list_node($2); }
            | inner_scope decl { add_list_node($2); }
+           | inner_scope cond { add_list_node($2); }
            | inner_scope 
              "{"         { $<node>list = current_list; 
                            current_list = create_node_list(); }[list]
@@ -88,23 +90,12 @@ inner_scope:
            ;
          ;
 
-/* body: sempre retorna um ASTNode* cujo type = NODE_LIST */
-body
-  : stmt    { ASTNode *l = create_node_list(); add_list_node($1); $$ = l; }
-  | scope   { $$ = $1; }
-  ;
+stmt: VAR_NAME[name] ";" { $$ = create_var_node(VAR_PRINT, NULL, $name, NULL); } 
+    ;
 
-stmt:
-      VAR_NAME[name] ";" { $$ = create_var_node(VAR_PRINT, NULL, $name, NULL); } 
-
-    /* while (expr) body */
-    | WHILE "(" expr ")" body
-      { $$ = create_while_node($3, $5); }
-
-    /* do body while (expr); */
-    | DO body WHILE "(" expr ")" ";"
-      { $$ = create_do_while_node($2, $5); }
-    | if_stmt { $$ = $1; }
+cond: if_stmt       { $$ = $1; } 
+    | while_stmt    { $$ = $1; }
+    | do_while_stmt { $$ = $1; }
     ;
 
 if_stmt: "if" "(" expr ")" decl else_stmt  { $$ = create_if_node($3, $5, $6); }
@@ -116,7 +107,15 @@ else_stmt: { $$ = NULL; }
          | "else" decl    { $$ = $2; }
          | "else" stmt    { $$ = $2; }
          | "else" scope   { $$ = $2; }
+         | "else" if_stmt { $$ = $2; }
          ;
+
+while_stmt: "while" "(" expr ")" scope { $$ = create_while_node($3, $5, true); }
+          | "while" "(" expr ")" decl  { $$ = create_while_node($3, $5, true); }
+          | "while" "(" expr ")" stmt  { $$ = create_while_node($3, $5, true); }
+          ;
+
+do_while_stmt: "do" scope "while" "(" expr ")" ";" { $$ = create_while_node($5, $2, false); }
 
 decl: var_decl   { $$ = $1; }
     | var_update { $$ = $1; }

@@ -57,6 +57,7 @@ Atualmente foram implementadas as seguintes suítes de testes:
 |  expr   |       8        | Expressões aritméticas                                     |
 | scopes  |       3        | Criação de escopos, uso de variáveis de escopos diferentes |
 | if_else |       7        | Estruturas `if`, `else` e `else if`                        |
+|  while  |       3        | Estruturas `while` e `do while`                            |
 
 ---
 
