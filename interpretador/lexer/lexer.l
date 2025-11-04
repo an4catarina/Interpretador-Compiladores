@@ -31,6 +31,8 @@ AL  [_a-zA-Z]
 "++"            { return INCR; }
 "--"            { return DECR; }
 "%"             { return MOD; }
+"while"         {return WHILE; }
+"do"            {return DO; }
 
 "if"            { return IF; }
 "else"          { return ELSE; }

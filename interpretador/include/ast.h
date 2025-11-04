@@ -45,6 +45,8 @@ typedef enum {
 
   // Nó com lista de nós
   NODE_LIST,
+  NODE_WHILE,
+  NODE_DO_WHILE,
 
   // Nó if
   IF_STMT,

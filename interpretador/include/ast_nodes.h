@@ -2,6 +2,7 @@
 #define AST_NODES_H
 
 #include "ast.h"
+#include <stdbool.h>
 
 typedef struct {
   char *type;
@@ -21,6 +22,11 @@ typedef struct list {
   struct list *last;
 } ListNode;
 
+typedef struct WhileNode {
+  ASTNode *condition;
+  ASTNode *body;
+} WhileNode;
+
 extern ASTNode *current_list;
 
 extern ASTNode *create_var_node(NodeType node_type, char *type, char *name,
@@ -31,10 +37,15 @@ extern ASTNode *create_expr_node(NodeType type, void *value, ASTNode *left,
                                  ASTNode *right);
 extern void free_expr_node(ASTNode *node);
 
+extern ASTNode *create_while_node(ASTNode *condition, ASTNode *body,
+                                  bool is_while);
+extern void free_while_node(ASTNode *node);
+
 extern ASTNode *create_node_list();
 extern void add_list_node(ASTNode *node);
 extern void free_list_node(ASTNode *node);
-extern ASTNode *create_if_node(ASTNode *condition, ASTNode *if_body, ASTNode *else_body);
+extern ASTNode *create_if_node(ASTNode *condition, ASTNode *if_body,
+                               ASTNode *else_body);
 extern void free_if_node(ASTNode *node);
 
 typedef struct {

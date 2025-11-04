@@ -223,6 +223,23 @@ double exec_node_list(ListNode *node) {
   return r;
 }
 
+static int to_bool(double v) { return v != 0.0; }
+
+void exec_while_node(ASTNode* node) {
+  WhileNode* w = node->data;
+  while (to_bool(exec_node(w->condition))) {
+    exec_node(w->body);
+  }
+}
+
+void exec_do_while_node(ASTNode* node) {
+  WhileNode* d = node->data;
+  do {
+    exec_node(d->body);
+  } while (to_bool(exec_node(d->condition)));
+}
+
+
 double exec_if_node(ASTNode *node) {
   if (!node || node->type != IF_STMT)
     return 0;
