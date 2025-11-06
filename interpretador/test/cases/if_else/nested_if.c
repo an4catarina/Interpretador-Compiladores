@@ -1,11 +1,13 @@
-int x;
-if (1) {
+int main() {
+  int x;
   if (1) {
-    x = 8;
+    if (1) {
+      x = 8;
+    } else {
+      x = 0;
+    }
   } else {
-    x = 0;
+    x = -8;
   }
-} else {
-  x = -8;
+  x;
 }
-x;

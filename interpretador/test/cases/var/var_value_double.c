@@ -1,3 +1,5 @@
 // Não falha
-double d = 3.1415;
-d;
+int main() {
+  double d = 3.1415;
+  d;
+}

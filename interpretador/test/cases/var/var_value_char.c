@@ -1,3 +1,5 @@
 // Não falha
-char c = 'A';
-c;
+int main() {
+  char c = 'A';
+  c;
+}

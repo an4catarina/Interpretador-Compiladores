@@ -1,5 +1,7 @@
-int x;
-if (1) {
-  x = 15;
+int main() {
+  int x;
+  if (1) {
+    x = 15;
+  }
+  x;
 }
-x;

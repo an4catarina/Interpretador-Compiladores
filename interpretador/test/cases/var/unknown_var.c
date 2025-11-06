@@ -1,2 +1,2 @@
 // Falha
-m = 10;
+int main() { m = 10; }

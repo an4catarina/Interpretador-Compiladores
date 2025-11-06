@@ -4,7 +4,7 @@ test_files = glob(f"{tests_path}/scopes/*.c")
 test_files = sorted(list(test_files))
 expected_return_code = [1, 0, 0]
 expected_output = [
-    "[ERRO] Uso de variável desconhecida na linha 8",
+    "[ERRO] Uso de variável desconhecida na linha 9",
     "",
     "",
 ]

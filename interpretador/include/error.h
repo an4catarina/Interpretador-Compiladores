@@ -2,6 +2,7 @@
 #define ERROR_H
 
 typedef enum {
+  MULTIPLE_MAINS,
   SYNTAX_ERROR,
   DECL_INVALID_TYPE,
   INIT_INVALID_TYPE,

@@ -4,6 +4,9 @@
 
 void exit_with_error(const ErrorType e, int line) {
   switch (e) {
+  case MULTIPLE_MAINS:
+    fprintf(stderr, "[ERRO] Segunda main declarada na linha %d\n", line);
+    break;
   case SYNTAX_ERROR:
     fprintf(stderr, "[ERRO] Sintaxe inválida na linha %d\n", line);
     break;

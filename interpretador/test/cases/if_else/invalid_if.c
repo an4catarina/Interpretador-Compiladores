@@ -1,3 +1,5 @@
-int x;
-if (1
-    x = 5;
+int main() {
+  int x;
+  if (1
+      x = 5;
+}

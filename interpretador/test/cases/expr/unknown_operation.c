@@ -1,2 +1,2 @@
 // Falha
-int n = 12 ^ 2;
+int main() { int n = 12 ` 2; }

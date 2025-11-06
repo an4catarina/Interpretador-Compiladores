@@ -1,2 +1,2 @@
 // Falha
-string s = "Hello";
+int main() { string s = "Hello"; }

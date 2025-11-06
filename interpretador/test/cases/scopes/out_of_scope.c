@@ -1,9 +1,11 @@
 // Falha
-{
-  int n = 10;
+int main() {
   {
-    float m = n / 3;
+    int n = 10;
+    {
+      float m = n / 3;
+      m;
+    }
     m;
   }
-  m;
 }

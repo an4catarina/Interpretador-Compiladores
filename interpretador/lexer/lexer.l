@@ -5,6 +5,7 @@
 #include "utils.h"
 #include "meta.h"
 #include "parser.tab.h"
+#include "error.h"
 %}
 
 %option always-interactive
@@ -71,7 +72,13 @@ AL  [_a-zA-Z]
 
 "//".*    { /* Comentário */}
 
-"int main()" { return MAIN; }
+"int main()" { if (!main_declared) {
+                 main_declared = 1;
+                 return MAIN;
+               } else {
+                 exit_with_error(MULTIPLE_MAINS, parser_line);
+               }
+             }
 
 \n        { parser_line++; }
 

@@ -1,3 +1,5 @@
 // Não falha
-int i = 10;
-i;
+int main() {
+  int i = 10;
+  i;
+}

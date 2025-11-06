@@ -65,11 +65,8 @@ void yyerror(const char *s);
 %%
 
 program:
-       | program stmt     { exec_node($2); free_node($2); }
-       | program decl     { exec_node($2); free_node($2); }
-       | program scope    { exec_node($2); free_node($2); }
-       | program expr ";" { exec_node($2); free_node($2); }
-       | program cond     { exec_node($2); free_node($2); }
+       | program decl       { exec_node($2); free_node($2); }
+       | program MAIN scope { exec_node($3); free_node($3); }
        ;
 
 scope: "{"         { $<node>list = current_list;

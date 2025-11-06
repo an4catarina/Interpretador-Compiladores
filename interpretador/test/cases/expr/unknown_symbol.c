@@ -1,2 +1,2 @@
 // Falha
-float f = 3.14 + ? ;
+int main() { float f = 3.14 + ? ; }
