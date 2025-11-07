@@ -27,6 +27,8 @@ void yyerror(const char *s);
 %type <node> expr
 %type <node> if_stmt else_stmt
 %type <node> while_stmt do_while_stmt
+%type <node> for_stmt
+%type <node> opt_expr
 
 /* Operadores Condicionais*/
 %token IF "if" ELSE "else"
@@ -48,6 +50,10 @@ void yyerror(const char *s);
 
 %token WHILE "while"
 %token DO "do"
+
+%token FOR "for"
+%token BREAK "break"
+%token CONTINUE "continue"
 
 %token MAIN
 
@@ -96,6 +102,7 @@ stmt: VAR_NAME[name] ";" { $$ = create_var_node(VAR_PRINT, NULL, $name, NULL); }
 cond: if_stmt       { $$ = $1; }
     | while_stmt    { $$ = $1; }
     | do_while_stmt { $$ = $1; }
+    | for_stmt      { $$ = $1; }
     ;
 
 if_stmt: "if" "(" expr ")" decl else_stmt  { $$ = create_if_node($3, $5, $6); }
@@ -116,6 +123,18 @@ while_stmt: "while" "(" expr ")" scope { $$ = create_while_node($3, $5, true); }
           ;
 
 do_while_stmt: "do" scope "while" "(" expr ")" ";" { $$ = create_while_node($5, $2, false); }
+
+for_stmt:
+      "for" "(" opt_expr ";" opt_expr ";" opt_expr ")" scope { $$ = create_for_node($3, $5, $7, $9); }
+    | "for" "(" opt_expr ";" opt_expr ";" opt_expr ")" stmt  { $$ = create_for_node($3, $5, $7, $9); }
+    | "for" "(" opt_expr ";" opt_expr ";" opt_expr ")" decl  { $$ = create_for_node($3, $5, $7, $9); }
+    ;
+
+opt_expr:
+      expr { $$ = $1; }
+    |      { $$ = NULL; }
+    ;
+
 
 decl: var_decl   { $$ = $1; }
     | var_update { $$ = $1; }

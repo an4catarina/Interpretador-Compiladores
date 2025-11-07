@@ -38,6 +38,10 @@ AL  [_a-zA-Z]
 "if"            { return IF; }
 "else"          { return ELSE; }
 
+"for"           { return FOR; }
+"break"         { return BREAK; }
+"continue"      { return CONTINUE; }
+
 "=="            { return EQ; }
 "!="            { return NE; }
 "<"             { return LT; }

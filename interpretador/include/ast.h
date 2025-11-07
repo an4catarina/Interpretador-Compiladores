@@ -3,7 +3,8 @@
 
 #include <stdbool.h>
 
-typedef enum {
+typedef enum
+{
   // Variáveis
   VAR_DECL,
   VAR_INIT,
@@ -47,12 +48,14 @@ typedef enum {
   NODE_LIST,
   NODE_WHILE,
   NODE_DO_WHILE,
+  NODE_FOR,
 
   // Nó if
   IF_STMT,
 } NodeType;
 
-typedef struct {
+typedef struct
+{
   NodeType type;
   void *data;
   int line;

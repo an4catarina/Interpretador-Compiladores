@@ -7,36 +7,48 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-double exec_node(ASTNode *node) {
+double exec_node(ASTNode *node)
+{
   if (node == NULL)
     return 0;
 
   NodeType type = node->type;
 
   // Executa nós do prefixo VAR
-  if (type >= VAR_DECL && type <= VAR_PRINT) {
+  if (type >= VAR_DECL && type <= VAR_PRINT)
+  {
     VarNode *data = node->data;
-    switch (type) {
+    switch (type)
+    {
     case VAR_DECL:
-      if (exec_var_decl(data)) {
+      if (exec_var_decl(data))
+      {
         printf("[DEBUG] Declaração de variável: %s\n", data->name);
-      } else {
+      }
+      else
+      {
         exit_with_error(VAR_REDECLARATION, node->line);
       }
       break;
 
     case VAR_INIT:
-      if (exec_var_init(data)) {
+      if (exec_var_init(data))
+      {
         printf("[DEBUG] Inicializando a variável: %s\n", data->name);
-      } else {
+      }
+      else
+      {
         exit_with_error(VAR_REDECLARATION, node->line);
       }
       break;
 
     case VAR_UPDATE:
-      if (exec_var_update(data)) {
+      if (exec_var_update(data))
+      {
         printf("[DEBUG] Atualizando valor da variável: %s\n", data->name);
-      } else {
+      }
+      else
+      {
         exit_with_error(UNKNOWN_VAR, node->line);
       }
       break;
@@ -65,10 +77,14 @@ double exec_node(ASTNode *node) {
   if (type == NODE_DO_WHILE)
     exec_do_while_node(node);
 
+  if (type == NODE_FOR)
+    exec_for_node(node);
+
   return 0;
 }
 
-void free_node(ASTNode *node) {
+void free_node(ASTNode *node)
+{
   NodeType type = node->type;
 
   // Limpa nós do prefixo VAR
@@ -87,4 +103,7 @@ void free_node(ASTNode *node) {
 
   if (type == NODE_WHILE || type == NODE_DO_WHILE)
     free_while_node(node);
+
+  if (type == NODE_FOR)
+    free_for_node(node);
 }
