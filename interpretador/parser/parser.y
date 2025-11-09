@@ -131,8 +131,9 @@ for_stmt:
     ;
 
 opt_expr:
-      expr { $$ = $1; }
-    |      { $$ = NULL; }
+      expr    { $$ = $1; }
+    | decl    { $$ = $1; }
+    |        { $$ = NULL; }
     ;
 
 
@@ -156,7 +157,8 @@ var_update: VAR_NAME[name] "=" expr ";" {
           ;
 
 expr:
-      "(" expr ")"    { $$ = create_expr_node(EXPR_PAR, NULL, $2, NULL); }
+
+    | "(" expr ")"    { $$ = create_expr_node(EXPR_PAR, NULL, $2, NULL); }
     | VAR_NAME "++"   { $$ = create_expr_node(EXPR_INC_POST, $1, NULL, NULL); }   /* x++ */
     | VAR_NAME "--"   { $$ = create_expr_node(EXPR_DEC_POST, $1, NULL, NULL); }   /* x-- */
     | "++" VAR_NAME   { $$ = create_expr_node(EXPR_INC_PREV, $2, NULL, NULL); }   /* ++x */
