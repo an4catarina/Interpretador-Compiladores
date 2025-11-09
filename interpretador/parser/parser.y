@@ -23,7 +23,7 @@ void yyerror(const char *s);
 
 %type <node> decl stmt cond
 %type <node> var_decl var_update
-%type <node> scope
+%type <node> scope inner_scope
 %type <node> expr
 %type <node> if_stmt else_stmt
 %type <node> while_stmt do_while_stmt
@@ -75,26 +75,15 @@ program:
        | program MAIN scope { exec_node($3); free_node($3); }
        ;
 
-scope: "{"         { $<node>list = current_list;
-                     current_list = create_node_list(); }[list]
-       inner_scope
-       "}"         { $$ = current_list; current_list = $<node>list; }
-     ;
+scope: "{" inner_scope "}" { $$ = $2; };
 
-inner_scope:
-           | inner_scope stmt ";" { add_list_node($2); }
-           | inner_scope decl ";" { add_list_node($2); }
-           | inner_scope cond     { add_list_node($2); }
-           | inner_scope expr ";" { add_list_node($2); }
-           | inner_scope
-             "{"         { $<node>list = current_list;
-                           current_list = create_node_list(); }[list]
-             inner_scope
-             "}"         { ASTNode *l = current_list;
-                           current_list = $<node>list;
-                           add_list_node(l); }
+inner_scope: /* empty */          { $$ = create_node_list(); }
+           | inner_scope stmt ";" { add_list_node($1, $2); $$ = $1; }
+           | inner_scope decl ";" { add_list_node($1, $2); $$ = $1; }
+           | inner_scope cond     { add_list_node($1, $2); $$ = $1; }
+           | inner_scope expr ";" { add_list_node($1, $2); $$ = $1; }
+           | inner_scope scope    { add_list_node($1, $2); $$ = $1; }
            ;
-         ;
 
 stmt: VAR_NAME[name] { $$ = create_var_node(VAR_PRINT, NULL, $name, NULL); }
     ;
