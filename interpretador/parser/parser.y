@@ -71,7 +71,7 @@ void yyerror(const char *s);
 %%
 
 program:
-       | program decl       { exec_node($2); free_node($2); }
+       | program decl ";"   { exec_node($2); free_node($2); }
        | program MAIN scope { exec_node($3); free_node($3); }
        ;
 
@@ -82,8 +82,8 @@ scope: "{"         { $<node>list = current_list;
      ;
 
 inner_scope:
-           | inner_scope stmt     { add_list_node($2); }
-           | inner_scope decl     { add_list_node($2); }
+           | inner_scope stmt ";" { add_list_node($2); }
+           | inner_scope decl ";" { add_list_node($2); }
            | inner_scope cond     { add_list_node($2); }
            | inner_scope expr ";" { add_list_node($2); }
            | inner_scope
@@ -96,7 +96,7 @@ inner_scope:
            ;
          ;
 
-stmt: VAR_NAME[name] ";" { $$ = create_var_node(VAR_PRINT, NULL, $name, NULL); }
+stmt: VAR_NAME[name] { $$ = create_var_node(VAR_PRINT, NULL, $name, NULL); }
     ;
 
 cond: if_stmt       { $$ = $1; }
@@ -105,21 +105,21 @@ cond: if_stmt       { $$ = $1; }
     | for_stmt      { $$ = $1; }
     ;
 
-if_stmt: "if" "(" expr ")" decl else_stmt  { $$ = create_if_node($3, $5, $6); }
-       | "if" "(" expr ")" stmt else_stmt  { $$ = create_if_node($3, $5, $6); }
-       | "if" "(" expr ")" scope else_stmt { $$ = create_if_node($3, $5, $6); }
+if_stmt: "if" "(" expr ")" decl ";" else_stmt { $$ = create_if_node($3, $5, $7); }
+       | "if" "(" expr ")" stmt ";" else_stmt { $$ = create_if_node($3, $5, $7); }
+       | "if" "(" expr ")" scope else_stmt    { $$ = create_if_node($3, $5, $6); }
        ;
 
 else_stmt: { $$ = NULL; }
-         | "else" decl    { $$ = $2; }
-         | "else" stmt    { $$ = $2; }
-         | "else" scope   { $$ = $2; }
-         | "else" if_stmt { $$ = $2; }
+         | "else" decl ";" { $$ = $2; }
+         | "else" stmt ";" { $$ = $2; }
+         | "else" scope    { $$ = $2; }
+         | "else" if_stmt  { $$ = $2; }
          ;
 
-while_stmt: "while" "(" expr ")" scope { $$ = create_while_node($3, $5, true); }
-          | "while" "(" expr ")" decl  { $$ = create_while_node($3, $5, true); }
-          | "while" "(" expr ")" stmt  { $$ = create_while_node($3, $5, true); }
+while_stmt: "while" "(" expr ")" scope    { $$ = create_while_node($3, $5, true); }
+          | "while" "(" expr ")" decl ";" { $$ = create_while_node($3, $5, true); }
+          | "while" "(" expr ")" stmt ";" { $$ = create_while_node($3, $5, true); }
           ;
 
 do_while_stmt: "do" scope "while" "(" expr ")" ";" { $$ = create_while_node($5, $2, false); }
@@ -128,12 +128,13 @@ for_stmt:
       "for" "(" opt_expr ";" opt_expr ";" opt_expr ")" scope { $$ = create_for_node($3, $5, $7, $9); }
     | "for" "(" opt_expr ";" opt_expr ";" opt_expr ")" stmt  { $$ = create_for_node($3, $5, $7, $9); }
     | "for" "(" opt_expr ";" opt_expr ";" opt_expr ")" decl  { $$ = create_for_node($3, $5, $7, $9); }
+    | "for" { printf("okay\n"); }
     ;
 
 opt_expr:
-      expr    { $$ = $1; }
-    | decl    { $$ = $1; }
-    |        { $$ = NULL; }
+      expr { $$ = $1; }
+    | decl { $$ = $1; }
+    |      { $$ = NULL; }
     ;
 
 
@@ -141,24 +142,23 @@ decl: var_decl   { $$ = $1; }
     | var_update { $$ = $1; }
     ;
 
-var_decl: VAR_TYPE[type] VAR_NAME[name] ";" {
+var_decl: VAR_TYPE[type] VAR_NAME[name] {
             $$ = create_var_node(VAR_DECL, $type, $name, NULL);
 		      }
-        | error VAR_NAME[name] ";" { exit_with_error(DECL_INVALID_TYPE, parser_line); }
-        | VAR_TYPE[type] VAR_NAME[name] "=" expr ";" {
+        | error VAR_NAME[name] { exit_with_error(DECL_INVALID_TYPE, parser_line); }
+        | VAR_TYPE[type] VAR_NAME[name] "=" expr {
             $$ = create_var_node(VAR_INIT, $type, $name, $expr);
           }
-        | error VAR_NAME[name] "=" expr ";" { exit_with_error(INIT_INVALID_TYPE, parser_line); }
+        | error VAR_NAME[name] "=" expr { exit_with_error(INIT_INVALID_TYPE, parser_line); }
         ;
 
-var_update: VAR_NAME[name] "=" expr ";" {
+var_update: VAR_NAME[name] "=" expr {
               $$ = create_var_node(VAR_UPDATE, NULL, $name, $expr);
             }
           ;
 
 expr:
-
-    | "(" expr ")"    { $$ = create_expr_node(EXPR_PAR, NULL, $2, NULL); }
+      "(" expr ")"    { $$ = create_expr_node(EXPR_PAR, NULL, $2, NULL); }
     | VAR_NAME "++"   { $$ = create_expr_node(EXPR_INC_POST, $1, NULL, NULL); }   /* x++ */
     | VAR_NAME "--"   { $$ = create_expr_node(EXPR_DEC_POST, $1, NULL, NULL); }   /* x-- */
     | "++" VAR_NAME   { $$ = create_expr_node(EXPR_INC_PREV, $2, NULL, NULL); }   /* ++x */
