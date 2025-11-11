@@ -26,6 +26,19 @@ typedef struct list
   struct list *last;
 } ListNode;
 
+typedef struct
+{
+  ASTNode *condition;
+  ASTNode *if_body;
+  ASTNode *else_body;
+} ASTNodeIf;
+
+typedef struct
+{
+  ASTNode *left;
+  ASTNode *right;
+} ASTNodeCondition;
+
 typedef struct WhileNode
 {
   ASTNode *condition;
@@ -63,18 +76,5 @@ extern void free_list_node(ASTNode *node);
 extern ASTNode *create_if_node(ASTNode *condition, ASTNode *if_body,
                                ASTNode *else_body);
 extern void free_if_node(ASTNode *node);
-
-typedef struct
-{
-  ASTNode *condition;
-  ASTNode *if_body;
-  ASTNode *else_body;
-} ASTNodeIf;
-
-typedef struct
-{
-  ASTNode *left;
-  ASTNode *right;
-} ASTNodeCondition;
 
 #endif

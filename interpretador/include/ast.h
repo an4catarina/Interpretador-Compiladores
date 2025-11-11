@@ -46,12 +46,12 @@ typedef enum
 
   // Nó com lista de nós
   NODE_LIST,
+
+  // Controle de fluxo
+  NODE_IF,
   NODE_WHILE,
   NODE_DO_WHILE,
   NODE_FOR,
-
-  // Nó if
-  IF_STMT,
 } NodeType;
 
 typedef struct

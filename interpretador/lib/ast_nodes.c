@@ -184,7 +184,7 @@ ASTNode *create_if_node(ASTNode *condition, ASTNode *if_body,
     return NULL;
   }
 
-  node->type = IF_STMT;
+  node->type = NODE_IF;
   node->data = ifn;
   node->line = parser_line;
 
