@@ -1,4 +1,6 @@
 #include "utils.h"
+#include "ast.h"
+#include "ast_nodes.h"
 #include "error.h"
 #include "var.h"
 #include <stdio.h>
@@ -44,7 +46,10 @@ double convert_char(char *c) {
   return value;
 }
 
-void print_var(char *name, int line) {
+void print_var(ASTNode *node) {
+  VarNode *data = node->data;
+  char *name = data->name;
+
   Var *var = get_var(name);
   if (var != NULL) {
     VarType type = var->type;
@@ -74,7 +79,7 @@ void print_var(char *name, int line) {
       break;
     }
   } else {
-    exit_with_error(UNKNOWN_VAR, line);
+    exit_with_error(UNKNOWN_VAR, node->line);
   }
 }
 

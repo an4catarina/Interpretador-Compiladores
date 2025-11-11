@@ -5,9 +5,9 @@
 #include "ast_nodes.h"
 #include <stdbool.h>
 
-extern bool exec_var_decl(VarNode *node);
-extern bool exec_var_init(VarNode *node);
-extern bool exec_var_update(VarNode *node);
+extern bool exec_var_decl(ASTNode *node);
+extern bool exec_var_init(ASTNode *node);
+extern bool exec_var_update(ASTNode *node);
 
 extern double exec_expr_node(NodeType type, ASTNode *node);
 

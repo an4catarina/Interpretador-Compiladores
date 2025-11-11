@@ -2,94 +2,111 @@
 #include "ast.h"
 #include "ast_nodes.h"
 #include "error.h"
-#include "meta.h"
 #include "scope.h"
 #include "utils.h"
 #include "var.h"
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 
-bool exec_var_decl(VarNode *node) {
-  char *type = node->type;
-  char *name = node->name;
+bool exec_var_decl(ASTNode *node) {
+  VarNode *data = node->data;
+  char *type = data->type;
+  char *name = data->name;
+  bool success;
 
   if (strcmp(type, "int") == 0) {
-    return add_var(INT, name, NULL);
+    success = add_var(INT, name, NULL);
   }
 
   else if (strcmp(type, "float") == 0) {
-    return add_var(FLOAT, name, NULL);
+    success = add_var(FLOAT, name, NULL);
   }
 
   else if (strcmp(type, "double") == 0) {
-    return add_var(DOUBLE, name, NULL);
+    success = add_var(DOUBLE, name, NULL);
   }
 
   else if (strcmp(type, "char") == 0) {
-    return add_var(VAR_CHAR, name, NULL);
+    success = add_var(VAR_CHAR, name, NULL);
   }
 
-  return false;
+  if (success)
+    printf("[DEBUG] Declaração de variável: %s\n", name);
+  else
+    exit_with_error(VAR_REDECLARATION, node->line);
+
+  return success;
 }
 
-bool exec_var_init(VarNode *node) {
-  char *type = node->type;
-  char *name = node->name;
-  double value = exec_expr_node(node->value->type, node->value);
+bool exec_var_init(ASTNode *node) {
+  VarNode *data = node->data;
+  char *type = data->type;
+  char *name = data->name;
+  double value = exec_expr_node(data->value->type, data->value);
+  bool success;
 
   if (strcmp(type, "int") == 0) {
     int i = value;
-    return add_var(INT, name, &i);
+    success = add_var(INT, name, &i);
   }
 
   else if (strcmp(type, "float") == 0) {
     float f = value;
-    return add_var(FLOAT, name, &f);
+    success = add_var(FLOAT, name, &f);
   }
 
   else if (strcmp(type, "double") == 0) {
     double d = value;
-    return add_var(DOUBLE, name, &d);
+    success = add_var(DOUBLE, name, &d);
   }
 
   else if (strcmp(type, "char") == 0) {
     char c = value;
-    return add_var(VAR_CHAR, name, &c);
+    success = add_var(VAR_CHAR, name, &c);
   }
 
-  return false;
+  if (success)
+    printf("[DEBUG] Inicializando a variável: %s\n", name);
+  else
+    exit_with_error(VAR_REDECLARATION, node->line);
+
+  return success;
 }
 
-bool exec_var_update(VarNode *node) {
-  char *name = node->name;
-  double value = exec_expr_node(node->value->type, node->value);
+bool exec_var_update(ASTNode *node) {
+  VarNode *data = node->data;
+  char *name = data->name;
+  double value = exec_expr_node(data->value->type, data->value);
+  bool success;
 
   VarList *l = current_scope->var_list;
   Var *var = get_var(name);
 
   if (var == NULL)
-    return false;
+    exit_with_error(UNKNOWN_VAR, node->line);
 
   switch (var->type) {
   case INT:
-    return update_var(INT, var, &value);
+    success = update_var(INT, var, &value);
     break;
   case FLOAT:
-    return update_var(FLOAT, var, &value);
+    success = update_var(FLOAT, var, &value);
     break;
   case DOUBLE:
-    return update_var(DOUBLE, var, &value);
+    success = update_var(DOUBLE, var, &value);
     break;
   case VAR_CHAR:
-    return update_var(VAR_CHAR, var, &value);
+    success = update_var(VAR_CHAR, var, &value);
     break;
   default:
     return false;
     break;
   }
 
-  return false;
+  if (success)
+    printf("[DEBUG] Atualizando valor da variável: %s\n", name);
+
+  return success;
 }
 
 double exec_expr_node(NodeType type, ASTNode *node) {

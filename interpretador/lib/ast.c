@@ -1,9 +1,7 @@
 #include "ast.h"
 #include "ast_nodes.h"
 #include "ast_rules.h"
-#include "error.h"
 #include "utils.h"
-#include <stdio.h>
 #include <stdlib.h>
 
 double exec_node(ASTNode *node) {
@@ -11,32 +9,19 @@ double exec_node(ASTNode *node) {
     return 0;
 
   NodeType type = node->type;
-  VarNode *data = node->data;
 
   switch (type) {
   case VAR_DECL:
-    if (exec_var_decl(data)) {
-      printf("[DEBUG] Declaração de variável: %s\n", data->name);
-    } else {
-      exit_with_error(VAR_REDECLARATION, node->line);
-    }
+    exec_var_decl(node);
     break;
   case VAR_INIT:
-    if (exec_var_init(data)) {
-      printf("[DEBUG] Inicializando a variável: %s\n", data->name);
-    } else {
-      exit_with_error(VAR_REDECLARATION, node->line);
-    }
+    exec_var_init(node);
     break;
   case VAR_UPDATE:
-    if (exec_var_update(data)) {
-      printf("[DEBUG] Atualizando valor da variável: %s\n", data->name);
-    } else {
-      exit_with_error(UNKNOWN_VAR, node->line);
-    }
+    exec_var_update(node);
     break;
   case VAR_PRINT:
-    print_var(data->name, node->line);
+    print_var(node);
     break;
   case EXPR_NUM ... EXPR_DEC_POST:
     return exec_expr_node(node->type, node);
