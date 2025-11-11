@@ -8,7 +8,10 @@
 #include <stdio.h>
 #include <string.h>
 
-bool exec_var_decl(ASTNode *node) {
+static ExecReturn exec_operator_expr(NodeType type, ASTNode *node);
+static ExecReturn exec_variable_expr(NodeType type, ASTNode *node);
+
+ExecReturn exec_var_decl(ASTNode *node) {
   VarNode *data = node->data;
   char *type = data->type;
   char *name = data->name;
@@ -30,19 +33,23 @@ bool exec_var_decl(ASTNode *node) {
     success = add_var(VAR_CHAR, name, NULL);
   }
 
-  if (success)
+  if (success) {
     printf("[DEBUG] Declaração de variável: %s\n", name);
-  else
+    return (ExecReturn){EXEC_OK, 0};
+  } else {
     exit_with_error(VAR_REDECLARATION, node->line);
-
-  return success;
+    return (ExecReturn){EXEC_FAIL, 0};
+  }
 }
 
-bool exec_var_init(ASTNode *node) {
+ExecReturn exec_var_init(ASTNode *node) {
   VarNode *data = node->data;
   char *type = data->type;
   char *name = data->name;
-  double value = exec_expr_node(data->value->type, data->value);
+  ExecReturn ret = exec_expr_node(data->value->type, data->value);
+  if (ret.status != EXEC_OK)
+    return ret;
+  double value = ret.value;
   bool success;
 
   if (strcmp(type, "int") == 0) {
@@ -65,18 +72,22 @@ bool exec_var_init(ASTNode *node) {
     success = add_var(VAR_CHAR, name, &c);
   }
 
-  if (success)
+  if (success) {
     printf("[DEBUG] Inicializando a variável: %s\n", name);
-  else
+    return (ExecReturn){EXEC_OK, 0};
+  } else {
     exit_with_error(VAR_REDECLARATION, node->line);
-
-  return success;
+    return (ExecReturn){EXEC_FAIL, 0};
+  }
 }
 
-bool exec_var_update(ASTNode *node) {
+ExecReturn exec_var_update(ASTNode *node) {
   VarNode *data = node->data;
   char *name = data->name;
-  double value = exec_expr_node(data->value->type, data->value);
+  ExecReturn ret = exec_expr_node(data->value->type, data->value);
+  if (ret.status != EXEC_OK)
+    return ret;
+  double value = ret.value;
   bool success;
 
   VarList *l = current_scope->var_list;
@@ -99,195 +110,244 @@ bool exec_var_update(ASTNode *node) {
     success = update_var(VAR_CHAR, var, &value);
     break;
   default:
-    return false;
+    return (ExecReturn){EXEC_FAIL, 0};
+  }
+
+  if (success) {
+    printf("[DEBUG] Atualizando valor da variável: %s\n", name);
+    return (ExecReturn){EXEC_OK, 0};
+  }
+  return (ExecReturn){EXEC_FAIL, 0};
+}
+
+ExecReturn exec_expr_node(NodeType type, ASTNode *node) {
+  switch (type) {
+  case EXPR_NUM ... EXPR_CHAR:
+    ExprNode *expr = node->data;
+    double *n = expr->value;
+    return (ExecReturn){EXEC_OK, *n};
+  case EXPR_PLUS ... EXPR_PAR:
+    return exec_operator_expr(type, node);
+  case EXPR_INC_PREV ... EXPR_VAR:
+    return exec_variable_expr(type, node);
+  default:
+    return (ExecReturn){EXEC_OK, 0};
+  }
+}
+
+static ExecReturn exec_operator_expr(NodeType type, ASTNode *node) {
+  ExprNode *expr = node->data;
+  double left = 0;
+  double right = 0;
+  ExecReturn ret;
+
+  if (expr->left_expr) {
+    ret = exec_expr_node(expr->left_expr->type, expr->left_expr);
+    if (ret.status != EXEC_OK)
+      return ret;
+    left = ret.value;
+  }
+
+  if (expr->right_expr) {
+    ret = exec_expr_node(expr->right_expr->type, expr->right_expr);
+    if (ret.status != EXEC_OK)
+      return ret;
+    right = ret.value;
+  }
+
+  switch (type) {
+  case EXPR_PLUS:
+    return (ExecReturn){EXEC_OK, left + right};
+  case EXPR_MINUS:
+    return (ExecReturn){EXEC_OK, left - right};
+  case EXPR_TIMES:
+    return (ExecReturn){EXEC_OK, left * right};
+  case EXPR_DIV:
+    if (right == 0) {
+      exit_with_error(DIV_BY_ZERO, node->line);
+    }
+    return (ExecReturn){EXEC_OK, left / right};
+  case EXPR_EQUAL:
+    return (ExecReturn){EXEC_OK, left == right};
+  case EXPR_NEQUAL:
+    return (ExecReturn){EXEC_OK, left != right};
+  case EXPR_MOD:
+    if (right == 0 || (long)left != left || (long)right != right) {
+      exit_with_error(MOD_BY_ZERO, node->line);
+    }
+    return (ExecReturn){EXEC_OK, (long)left % (long)right};
+  case EXPR_NEG:
+    return (ExecReturn){EXEC_OK, -left};
+  case EXPR_LT:
+    return (ExecReturn){EXEC_OK, left < right};
+  case EXPR_GT:
+    return (ExecReturn){EXEC_OK, left > right};
+  case EXPR_LE:
+    return (ExecReturn){EXEC_OK, left <= right};
+  case EXPR_GE:
+    return (ExecReturn){EXEC_OK, left >= right};
+  case EXPR_AND:
+    return (ExecReturn){EXEC_OK, left && right};
+  case EXPR_OR:
+    return (ExecReturn){EXEC_OK, left || right};
+  case EXPR_NOT:
+    return (ExecReturn){EXEC_OK, !left};
+  case EXPR_PAR:
+    return (ExecReturn){EXEC_OK, left};
+  default:
+    return (ExecReturn){EXEC_OK, 0};
+  }
+}
+
+static ExecReturn exec_variable_expr(NodeType type, ASTNode *node) {
+  ExprNode *expr = node->data;
+  char *name = expr->value;
+
+  Var *var = get_var(name);
+  double value = get_var_value(name, node->line);
+
+  double d = 0;
+
+  switch (type) {
+  case EXPR_INC_PREV:
+    d = ++value;
+    update_var(DOUBLE, var, &value);
+    break;
+  case EXPR_INC_POST:
+    d = value++;
+    update_var(DOUBLE, var, &value);
+    break;
+  case EXPR_DEC_PREV:
+    d = --value;
+    update_var(DOUBLE, var, &value);
+    break;
+  case EXPR_DEC_POST:
+    d = value--;
+    update_var(DOUBLE, var, &value);
+    break;
+  case EXPR_VAR:
+    d = value;
+    break;
+  default:
     break;
   }
 
-  if (success)
-    printf("[DEBUG] Atualizando valor da variável: %s\n", name);
-
-  return success;
+  return (ExecReturn){EXEC_OK, d};
 }
 
-double exec_expr_node(NodeType type, ASTNode *node) {
-  double d = 0;
-  double l = 0;
-  double r = 0;
-
-  ExprNode *expr = node->data;
-
-  if (type == EXPR_NUM || type == EXPR_CHAR) {
-    double *n = expr->value;
-    d = *n;
-  } else if (type >= EXPR_PLUS && type <= EXPR_PAR) {
-    l = exec_expr_node(expr->left_expr->type, expr->left_expr);
-    if (expr->right_expr != NULL)
-      r = exec_expr_node(expr->right_expr->type, expr->right_expr);
-
-    switch (type) {
-    case EXPR_PLUS:
-      d = l + r;
-      break;
-    case EXPR_MINUS:
-      d = l - r;
-      break;
-    case EXPR_TIMES:
-      d = l * r;
-      break;
-    case EXPR_DIV:
-      if (r == 0) {
-        exit_with_error(DIV_BY_ZERO, node->line);
-      } else {
-        d = l / r;
-      }
-      break;
-    case EXPR_EQUAL:
-      d = l == r;
-      break;
-    case EXPR_NEQUAL:
-      d = l != r;
-      break;
-    case EXPR_MOD:
-      if (r == 0 || (long)l != l || (long)r != r) {
-        exit_with_error(MOD_BY_ZERO, node->line);
-      } else {
-        d = (long)l % (long)r;
-      }
-      break;
-    case EXPR_NEG:
-      d = -l;
-      break;
-    case EXPR_EQ:
-      d = l == r;
-      break;
-    case EXPR_NE:
-      d = l != r;
-      break;
-    case EXPR_LT:
-      d = l < r;
-      break;
-    case EXPR_GT:
-      d = l > r;
-      break;
-    case EXPR_LE:
-      d = l <= r;
-      break;
-    case EXPR_GE:
-      d = l >= r;
-      break;
-    case EXPR_AND:
-      d = l && r;
-      break;
-    case EXPR_OR:
-      d = l || r;
-      break;
-    case EXPR_NOT:
-      d = !l;
-      break;
-    case EXPR_PAR:
-      d = l;
-      break;
-    default:
-      break;
-    }
-  } else {
-    char *name = expr->value;
-    double value = get_var_value(name, node->line);
-    Var *var = get_var(name);
-
-    switch (type) {
-    case EXPR_INC_PREV:
-      d = ++value;
-      update_var(DOUBLE, var, &value);
-      break;
-    case EXPR_INC_POST:
-      d = value++;
-      update_var(DOUBLE, var, &value);
-      break;
-    case EXPR_DEC_PREV:
-      d = --value;
-      update_var(DOUBLE, var, &value);
-      break;
-    case EXPR_DEC_POST:
-      d = value--;
-      update_var(DOUBLE, var, &value);
-      break;
-    default:
-      d = value;
-      break;
-    }
-  }
-
-  return d;
-}
-
-double exec_node_list(ListNode *node) {
+ExecReturn exec_node_list(ListNode *node) {
   ListNode *n = node;
-  double r = 0;
-
-  VarNode *vn;
-  ListNode *ln;
+  ExecReturn ret = {EXEC_OK, 0};
 
   stack_scope();
 
   while (n != NULL) {
-    exec_node(n->node);
+    if (n->node) {
+      ret = exec_node(n->node);
+      if (ret.status == EXEC_BREAK || ret.status == EXEC_CONTINUE ||
+          ret.status == EXEC_FAIL) {
+        break;
+      }
+    }
     n = n->next;
   }
 
   pop_scope();
 
-  return r;
+  return ret;
 }
 
 static int to_bool(double v) { return v != 0.0; }
 
-void exec_while_node(ASTNode *node) {
+ExecReturn exec_while_node(ASTNode *node) {
   WhileNode *w = node->data;
-  while (to_bool(exec_node(w->condition))) {
-    exec_node(w->body);
+  ExecReturn ret;
+  while (to_bool(exec_node(w->condition).value)) {
+    ret = exec_node(w->body);
+    if (ret.status == EXEC_BREAK)
+      break;
+    if (ret.status == EXEC_CONTINUE)
+      continue;
+    if (ret.status == EXEC_FAIL)
+      return ret;
   }
+  return (ExecReturn){EXEC_OK, 0};
 }
 
-void exec_do_while_node(ASTNode *node) {
+ExecReturn exec_do_while_node(ASTNode *node) {
   WhileNode *d = node->data;
+  ExecReturn ret;
   do {
-    exec_node(d->body);
-  } while (to_bool(exec_node(d->condition)));
+    ret = exec_node(d->body);
+    if (ret.status == EXEC_BREAK)
+      break;
+    if (ret.status == EXEC_CONTINUE)
+      continue;
+    if (ret.status == EXEC_FAIL)
+      return ret;
+  } while (to_bool(exec_node(d->condition).value));
+  return (ExecReturn){EXEC_OK, 0};
 }
 
-double exec_if_node(ASTNode *node) {
+ExecReturn exec_if_node(ASTNode *node) {
   if (!node || node->type != NODE_IF)
-    return 0;
+    return (ExecReturn){EXEC_FAIL, 0};
 
   ASTNodeIf *ifn = (ASTNodeIf *)node->data;
   if (!ifn || !ifn->condition)
-    return 0;
+    return (ExecReturn){EXEC_FAIL, 0};
 
-  double condition_result = exec_node(ifn->condition);
+  ExecReturn condition_result = exec_node(ifn->condition);
+  if (condition_result.status != EXEC_OK)
+    return condition_result;
 
-  if (condition_result) {
+  if (condition_result.value) {
     return exec_node(ifn->if_body);
   } else if (ifn->else_body != NULL) {
     return exec_node(ifn->else_body);
   }
 
-  return 0;
+  return (ExecReturn){EXEC_OK, 0};
 }
 
-void exec_for_node(ASTNode *node) {
+ExecReturn exec_for_node(ASTNode *node) {
   if (!node || node->type != NODE_FOR)
-    return;
+    return (ExecReturn){EXEC_OK, 0};
 
   ForNode *f = (ForNode *)node->data;
-  if (f->init)
-    exec_node(f->init);
-  while (1) {
-    if (f->condition && !to_bool(exec_node(f->condition)))
-      break;
-    if (f->body)
-      exec_node(f->body);
-    if (f->step)
-      exec_node(f->step);
+  if (f->init) {
+    ExecReturn ret = exec_node(f->init);
+    if (ret.status != EXEC_OK)
+      return ret;
   }
+  while (1) {
+    if (f->condition) {
+      ExecReturn cond_ret = exec_node(f->condition);
+      if (cond_ret.status != EXEC_OK)
+        return cond_ret;
+      if (!to_bool(cond_ret.value))
+        break;
+    }
+    if (f->body) {
+      ExecReturn body_ret = exec_node(f->body);
+      if (body_ret.status == EXEC_BREAK)
+        break;
+      if (body_ret.status == EXEC_CONTINUE) {
+        if (f->step) {
+          ExecReturn step_ret = exec_node(f->step);
+          if (step_ret.status != EXEC_OK)
+            return step_ret;
+        }
+        continue;
+      }
+      if (body_ret.status == EXEC_FAIL)
+        return body_ret;
+    }
+    if (f->step) {
+      ExecReturn step_ret = exec_node(f->step);
+      if (step_ret.status != EXEC_OK)
+        return step_ret;
+    }
+  }
+  return (ExecReturn){EXEC_OK, 0};
 }

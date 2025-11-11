@@ -4,46 +4,37 @@
 #include "utils.h"
 #include <stdlib.h>
 
-double exec_node(ASTNode *node) {
+ExecReturn exec_node(ASTNode *node) {
   if (node == NULL)
-    return 0;
+    return (ExecReturn){EXEC_FAIL, 0};
 
   NodeType type = node->type;
 
   switch (type) {
   case VAR_DECL:
-    exec_var_decl(node);
-    break;
+    return exec_var_decl(node);
   case VAR_INIT:
-    exec_var_init(node);
-    break;
+    return exec_var_init(node);
   case VAR_UPDATE:
-    exec_var_update(node);
-    break;
+    return exec_var_update(node);
   case VAR_PRINT:
     print_var(node);
-    break;
-  case EXPR_NUM ... EXPR_DEC_POST:
+    return (ExecReturn){EXEC_OK, 0};
+  case EXPR_NUM ... EXPR_VAR:
     return exec_expr_node(node->type, node);
-    break;
   case NODE_LIST:
     return exec_node_list(node->data);
-    break;
   case NODE_IF:
     return exec_if_node(node);
-    break;
   case NODE_WHILE:
-    exec_while_node(node);
-    break;
+    return exec_while_node(node);
   case NODE_DO_WHILE:
-    exec_do_while_node(node);
-    break;
+    return exec_do_while_node(node);
   case NODE_FOR:
-    exec_for_node(node);
-    break;
+    return exec_for_node(node);
   }
 
-  return 0;
+  return (ExecReturn){EXEC_OK, 0};
 }
 
 void free_node(ASTNode *node) {
@@ -53,7 +44,7 @@ void free_node(ASTNode *node) {
   case VAR_DECL ... VAR_PRINT:
     free_var_node(node);
     break;
-  case EXPR_NUM ... EXPR_DEC_POST:
+  case EXPR_NUM ... EXPR_VAR:
     free_expr_node(node);
     break;
   case NODE_LIST:
