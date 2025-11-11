@@ -58,6 +58,8 @@ Atualmente foram implementadas as seguintes suítes de testes:
 | scopes  |       3        | Criação de escopos, uso de variáveis de escopos diferentes |
 | if_else |       7        | Estruturas `if`, `else` e `else if`                        |
 |  while  |       3        | Estruturas `while` e `do while`                            |
+|   for   |       2        | Laço de repetição `for`                                    |
+
 
 ---
 

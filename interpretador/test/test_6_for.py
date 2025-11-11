@@ -1,6 +1,7 @@
-from common import *
-import pytest
 from glob import glob
+
+import pytest
+from common import *
 
 test_files = sorted(glob(f"{tests_path}/for/*.c"))
 expected_return_code = [0, 0]  # for , double_for
@@ -10,7 +11,7 @@ expected_output = [
 ]
 
 
-class TestWhile:
+class TestFor:
     @pytest.mark.parametrize(
         "test_file, return_code, output",
         zip(test_files, expected_return_code, expected_output),
