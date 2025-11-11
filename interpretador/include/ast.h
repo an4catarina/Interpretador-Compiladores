@@ -3,7 +3,8 @@
 
 #include <stdbool.h>
 
-typedef enum {
+typedef enum
+{
   // Variáveis
   VAR_DECL,
   VAR_INIT,
@@ -45,14 +46,16 @@ typedef enum {
 
   // Nó com lista de nós
   NODE_LIST,
+
+  // Controle de fluxo
+  NODE_IF,
   NODE_WHILE,
   NODE_DO_WHILE,
-
-  // Nó if
-  IF_STMT,
+  NODE_FOR,
 } NodeType;
 
-typedef struct {
+typedef struct
+{
   NodeType type;
   void *data;
   int line;

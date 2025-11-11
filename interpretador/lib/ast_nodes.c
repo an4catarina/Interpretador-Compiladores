@@ -5,8 +5,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-ASTNode *current_list = NULL;
-
 ASTNode *create_var_node(NodeType node_type, char *type, char *name,
                          ASTNode *value) {
   ASTNode *node = malloc(sizeof(ASTNode));
@@ -106,11 +104,11 @@ ASTNode *create_node_list() {
   return node;
 }
 
-void add_list_node(ASTNode *node) {
-  if (node == NULL)
+void add_list_node(ASTNode *list_node, ASTNode *node) {
+  if (node == NULL || list_node == NULL)
     return;
 
-  ListNode *list = current_list->data;
+  ListNode *list = list_node->data;
 
   if (list->node == NULL) {
     list->node = node;
@@ -186,7 +184,7 @@ ASTNode *create_if_node(ASTNode *condition, ASTNode *if_body,
     return NULL;
   }
 
-  node->type = IF_STMT;
+  node->type = NODE_IF;
   node->data = ifn;
   node->line = parser_line;
 
@@ -214,4 +212,38 @@ void free_if_node(ASTNode *node) {
 
   free(ifn);
   free(node);
+}
+
+ASTNode *create_for_node(ASTNode *init, ASTNode *condition, ASTNode *step,
+                         ASTNode *body) {
+  ASTNode *node = malloc(sizeof(ASTNode));
+  node->type = NODE_FOR;
+  node->line = parser_line;
+
+  ForNode *f = malloc(sizeof(ForNode));
+  f->init = init;
+  f->condition = condition;
+  f->step = step;
+  f->body = body;
+
+  node->data = f;
+  return node;
+}
+
+void free_for_node(ASTNode *node) {
+  if (node) {
+    ForNode *f = node->data;
+    if (f) {
+      if (f->init)
+        free_node(f->init);
+      if (f->condition)
+        free_node(f->condition);
+      if (f->step)
+        free_node(f->step);
+      if (f->body)
+        free_node(f->body);
+      free(f);
+    }
+    free(node);
+  }
 }

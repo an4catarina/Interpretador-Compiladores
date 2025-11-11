@@ -173,7 +173,6 @@ double exec_expr_node(NodeType type, ASTNode *node) {
     default:
       break;
     }
-
   } else {
     char *name = expr->value;
     double value = get_var_value(name, node->line);
@@ -241,7 +240,7 @@ void exec_do_while_node(ASTNode *node) {
 }
 
 double exec_if_node(ASTNode *node) {
-  if (!node || node->type != IF_STMT)
+  if (!node || node->type != NODE_IF)
     return 0;
 
   ASTNodeIf *ifn = (ASTNodeIf *)node->data;
@@ -257,4 +256,21 @@ double exec_if_node(ASTNode *node) {
   }
 
   return 0;
+}
+
+void exec_for_node(ASTNode *node) {
+  if (!node || node->type != NODE_FOR)
+    return;
+
+  ForNode *f = (ForNode *)node->data;
+  if (f->init)
+    exec_node(f->init);
+  while (1) {
+    if (f->condition && !to_bool(exec_node(f->condition)))
+      break;
+    if (f->body)
+      exec_node(f->body);
+    if (f->step)
+      exec_node(f->step);
+  }
 }
