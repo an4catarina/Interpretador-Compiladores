@@ -2,6 +2,7 @@
 #define AST_NODES_H
 
 #include "ast.h"
+#include "func.h"
 #include <stdbool.h>
 
 typedef struct
@@ -53,28 +54,38 @@ typedef struct
   ASTNode *body;
 } ForNode;
 
-extern ASTNode *current_list;
+typedef struct {
+  Builtins func;
+  ParamList *params;
+} FuncNode;
 
-extern ASTNode *create_var_node(NodeType node_type, char *type, char *name,
-                                ASTNode *value);
+// Funções VarNode
+extern ASTNode *create_var_node(NodeType node_type, char *type, char *name, ASTNode *value);
 extern void free_var_node(ASTNode *node);
 
-extern ASTNode *create_expr_node(NodeType type, void *value, ASTNode *left,
-                                 ASTNode *right);
+// Funções ExprNode
+extern ASTNode *create_expr_node(NodeType type, void *value, ASTNode *left, ASTNode *right);
 extern void free_expr_node(ASTNode *node);
 
+// Funções ForNode
 extern ASTNode *create_for_node(ASTNode *init, ASTNode *condition, ASTNode *step, ASTNode *body);
 extern void free_for_node(ASTNode *node);
 
-extern ASTNode *create_while_node(ASTNode *condition, ASTNode *body,
-                                  bool is_while);
+// Funções WhileNode
+extern ASTNode *create_while_node(ASTNode *condition, ASTNode *body, bool is_while);
 extern void free_while_node(ASTNode *node);
 
+// Funções ListNode
 extern ASTNode *create_node_list();
 extern void add_list_node(ASTNode *list, ASTNode *node);
 extern void free_list_node(ASTNode *node);
-extern ASTNode *create_if_node(ASTNode *condition, ASTNode *if_body,
-                               ASTNode *else_body);
+
+// Funções ASTNodeIf
+extern ASTNode *create_if_node(ASTNode *condition, ASTNode *if_body, ASTNode *else_body);
 extern void free_if_node(ASTNode *node);
+
+// Funções FuncNode
+extern ASTNode *create_func_node(Builtins func, ParamList *params);
+extern void free_func_node(ASTNode *node);
 
 #endif

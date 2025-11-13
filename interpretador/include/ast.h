@@ -50,6 +50,9 @@ typedef enum
   NODE_WHILE,
   NODE_DO_WHILE,
   NODE_FOR,
+
+  // Nós de funções
+  NODE_FUNC,
 } NodeType;
 
 typedef enum {
