@@ -11,6 +11,8 @@ typedef enum {
   VAR_REDECLARATION,
   DIV_BY_ZERO,
   MOD_BY_ZERO,
+  BREAK_OUT_OF_LOOP,
+  CONTINUE_OUT_OF_LOOP,
 } ErrorType;
 
 extern void exit_with_error(const ErrorType e, int line);

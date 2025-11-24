@@ -245,8 +245,15 @@ ExecReturn exec_node_list(ListNode *node) {
   while (n != NULL) {
     if (n->node) {
       ret = exec_node(n->node);
-      if (ret.status == EXEC_BREAK || ret.status == EXEC_CONTINUE ||
-          ret.status == EXEC_FAIL) {
+      if (ret.status == EXEC_BREAK) {
+        printf("[DEBUG] Break na linha %d\n", n->node->line);
+        break;
+      }
+      if (ret.status == EXEC_CONTINUE) {
+        printf("[DEBUG] Continue na linha %d\n", n->node->line);
+        break;
+      }
+      if (ret.status == EXEC_FAIL) {
         break;
       }
     }

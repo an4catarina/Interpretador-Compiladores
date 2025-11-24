@@ -24,7 +24,7 @@ void yyerror(const char *s);
 %token <strValue> VAR_NAME VAR_TYPE
 %token SEMI ";" ATTR "=" COMMA ","
 
-%type <node> decl stmt cond
+%type <node> decl stmt cond loop
 %type <node> var_decl var_update
 %type <node> scope inner_scope
 %type <node> expr
@@ -89,18 +89,31 @@ inner_scope: /* empty */          { $$ = create_node_list(); }
            | inner_scope stmt ";" { add_list_node($1, $2); $$ = $1; }
            | inner_scope decl ";" { add_list_node($1, $2); $$ = $1; }
            | inner_scope cond     { add_list_node($1, $2); $$ = $1; }
+           | inner_scope { is_loop++; }
+             loop        { add_list_node($1, $3); $$ = $1; is_loop--; }
            | inner_scope expr ";" { add_list_node($1, $2); $$ = $1; }
            | inner_scope scope    { add_list_node($1, $2); $$ = $1; }
            ;
 
 stmt: VAR_NAME[name] { $$ = create_var_node(VAR_PRINT, NULL, $name, NULL); }
-    | BREAK  { $$ = create_break_node(); }
-    | CONTINUE { $$ = create_continue_node(); }
-
+    | BREAK  {
+        if (is_loop)
+          $$ = create_break_node();
+        else
+          exit_with_error(BREAK_OUT_OF_LOOP, parser_line);
+      }
+    | CONTINUE {
+        if (is_loop)
+          $$ = create_continue_node();
+        else
+          exit_with_error(CONTINUE_OUT_OF_LOOP, parser_line);
+      }
     ;
 
 cond: if_stmt       { $$ = $1; }
-    | while_stmt    { $$ = $1; }
+    ;
+
+loop: while_stmt    { $$ = $1; }
     | do_while_stmt { $$ = $1; }
     | for_stmt      { $$ = $1; }
     ;
