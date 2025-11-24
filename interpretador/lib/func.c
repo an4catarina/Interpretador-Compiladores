@@ -1,6 +1,8 @@
 #include "func.h"
+#include "error.h"
 #include "utils.h"
 #include "var.h"
+#include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -95,6 +97,25 @@ double get_param_value(ParamList *list, int n, int line) {
   }
 }
 
+static double test_func(ParamList *list, int line);
+static double pow_func(ParamList *list, int line);
+static double sqrt_func(ParamList *list, int line);
+
+double run_builtin_func(Builtins func, ParamList *list, int line) {
+  double result = 0;
+
+  switch (func) {
+  case TEST_FUNC:
+    return test_func(list, line);
+  case POW_FUNC:
+    return pow_func(list, line);
+  case SQRT_FUNC:
+    return sqrt_func(list, line);
+  }
+
+  return result;
+}
+
 static double test_func(ParamList *list, int line) {
   for (int i = 1; i <= list->len; i++) {
     double n = get_param_value(list, i, line);
@@ -104,13 +125,21 @@ static double test_func(ParamList *list, int line) {
   return list->len;
 }
 
-double run_builtin_func(Builtins func, ParamList *list, int line) {
-  double result = 0;
+static double pow_func(ParamList *list, int line) {
+  if (list->len != 2)
+    exit_with_error(WRONG_FUNC_CALL, line);
 
-  switch (func) {
-  case TEST_FUNC:
-    return test_func(list, line);
-  }
+  double n = get_param_value(list, 1, line);
+  double m = get_param_value(list, 2, line);
 
-  return result;
+  return pow(n, m);
+}
+
+static double sqrt_func(ParamList *list, int line) {
+  if (list->len != 1)
+    exit_with_error(WRONG_FUNC_CALL, line);
+
+  double n = get_param_value(list, 1, line);
+
+  return sqrt(n);
 }

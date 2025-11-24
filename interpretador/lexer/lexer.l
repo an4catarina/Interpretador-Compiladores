@@ -60,6 +60,8 @@ AL  [_a-zA-Z]
 }
 
 "test_func"    { return NODE_TEST_FUNC; }
+"pow"          { return NODE_POW_FUNC;  }
+"sqrt"         { return NODE_SQRT_FUNC; }
 
 {AL}{AN}* {
     yylval.strValue = strdup(yytext);

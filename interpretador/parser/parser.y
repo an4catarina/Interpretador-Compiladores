@@ -64,6 +64,8 @@ void yyerror(const char *s);
 
 /* Funcões */
 %token NODE_TEST_FUNC "test_func"
+%token NODE_POW_FUNC "pow"
+%token NODE_SQRT_FUNC "sqrt"
 
 /* Precedência e associatividade */
 %left PLUS MINUS
@@ -198,6 +200,8 @@ expr:
     ;
 
 func: "test_func" { $$ = TEST_FUNC; }
+    | "pow"       { $$ = POW_FUNC; }
+    | "sqrt"      { $$ = SQRT_FUNC; }
     ;
 
 params: /* empty */         { $$ = create_param_list(); }

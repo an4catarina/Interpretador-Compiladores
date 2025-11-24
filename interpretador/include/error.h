@@ -13,6 +13,7 @@ typedef enum {
   MOD_BY_ZERO,
   BREAK_OUT_OF_LOOP,
   CONTINUE_OUT_OF_LOOP,
+  WRONG_FUNC_CALL,
 } ErrorType;
 
 extern void exit_with_error(const ErrorType e, int line);

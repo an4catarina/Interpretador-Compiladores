@@ -38,3 +38,5 @@ target_include_directories(interpretador PRIVATE
   ${CMAKE_CURRENT_LIST_DIR}
   include
 )
+
+target_link_libraries(interpretador m)

@@ -17,6 +17,8 @@ typedef struct {
 
 typedef enum {
   TEST_FUNC,
+  POW_FUNC,
+  SQRT_FUNC,
 } Builtins;
 
 extern ParamList *create_param_list();

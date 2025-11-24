@@ -59,6 +59,7 @@ Atualmente foram implementadas as seguintes suítes de testes:
 | if_else |       7        | Estruturas `if`, `else` e `else if`                        |
 |  while  |       3        | Estruturas `while` e `do while`                            |
 |   for   |       2        | Laço de repetição `for`                                    |
+|  funcs  |       4        | Invocação de funções builtins                              |
 
 
 ---

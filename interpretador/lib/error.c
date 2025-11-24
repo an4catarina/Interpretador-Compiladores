@@ -42,6 +42,10 @@ void exit_with_error(const ErrorType e, int line) {
   case CONTINUE_OUT_OF_LOOP:
     fprintf(stderr, "[ERRO] 'continue' fora de loop na linha %d\n", line);
     break;
+  case WRONG_FUNC_CALL:
+    fprintf(stderr, "[ERRO] Função invocada incorretamente na linha %d\n",
+            line);
+    break;
   }
   exit(1);
 }
