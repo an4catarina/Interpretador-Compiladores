@@ -50,9 +50,14 @@ typedef enum
   NODE_WHILE,
   NODE_DO_WHILE,
   NODE_FOR,
+
+  // Break e continue
+  NODE_BREAK,
+  NODE_CONTINUE,
 } NodeType;
 
-typedef enum {
+typedef enum
+{
   EXEC_OK,
   EXEC_FAIL,
   EXEC_BREAK,
@@ -66,7 +71,8 @@ typedef struct
   int line;
 } ASTNode;
 
-typedef struct {
+typedef struct
+{
   ExecStatus status;
   double value;
 } ExecReturn;

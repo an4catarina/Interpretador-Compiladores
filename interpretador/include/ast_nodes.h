@@ -70,6 +70,9 @@ extern ASTNode *create_while_node(ASTNode *condition, ASTNode *body,
                                   bool is_while);
 extern void free_while_node(ASTNode *node);
 
+extern ASTNode *create_break_node();
+extern ASTNode *create_continue_node();
+
 extern ASTNode *create_node_list();
 extern void add_list_node(ASTNode *list, ASTNode *node);
 extern void free_list_node(ASTNode *node);

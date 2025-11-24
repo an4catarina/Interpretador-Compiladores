@@ -86,6 +86,9 @@ inner_scope: /* empty */          { $$ = create_node_list(); }
            ;
 
 stmt: VAR_NAME[name] { $$ = create_var_node(VAR_PRINT, NULL, $name, NULL); }
+    | BREAK  { $$ = create_break_node(); }
+    | CONTINUE { $$ = create_continue_node(); }
+
     ;
 
 cond: if_stmt       { $$ = $1; }
