@@ -19,6 +19,7 @@ set(LIBRARY
   ast_nodes.c
   ast_rules.c
   error.c
+  func.c
   meta.c
   scope.c
   utils.c

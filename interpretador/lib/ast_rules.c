@@ -2,6 +2,7 @@
 #include "ast.h"
 #include "ast_nodes.h"
 #include "error.h"
+#include "func.h"
 #include "scope.h"
 #include "utils.h"
 #include "var.h"
@@ -46,7 +47,7 @@ ExecReturn exec_var_init(ASTNode *node) {
   VarNode *data = node->data;
   char *type = data->type;
   char *name = data->name;
-  ExecReturn ret = exec_expr_node(data->value->type, data->value);
+  ExecReturn ret = exec_node(data->value);
   if (ret.status != EXEC_OK)
     return ret;
   double value = ret.value;
@@ -84,7 +85,7 @@ ExecReturn exec_var_init(ASTNode *node) {
 ExecReturn exec_var_update(ASTNode *node) {
   VarNode *data = node->data;
   char *name = data->name;
-  ExecReturn ret = exec_expr_node(data->value->type, data->value);
+  ExecReturn ret = exec_node(data->value);
   if (ret.status != EXEC_OK)
     return ret;
   double value = ret.value;
@@ -142,14 +143,14 @@ static ExecReturn exec_operator_expr(NodeType type, ASTNode *node) {
   ExecReturn ret;
 
   if (expr->left_expr) {
-    ret = exec_expr_node(expr->left_expr->type, expr->left_expr);
+    ret = exec_node(expr->left_expr);
     if (ret.status != EXEC_OK)
       return ret;
     left = ret.value;
   }
 
   if (expr->right_expr) {
-    ret = exec_expr_node(expr->right_expr->type, expr->right_expr);
+    ret = exec_node(expr->right_expr);
     if (ret.status != EXEC_OK)
       return ret;
     right = ret.value;
@@ -312,7 +313,7 @@ ExecReturn exec_if_node(ASTNode *node) {
 
 ExecReturn exec_for_node(ASTNode *node) {
   if (!node || node->type != NODE_FOR)
-    return (ExecReturn){EXEC_OK, 0};
+    return (ExecReturn){EXEC_FAIL, 0};
 
   ForNode *f = (ForNode *)node->data;
   if (f->init) {
@@ -350,4 +351,15 @@ ExecReturn exec_for_node(ASTNode *node) {
     }
   }
   return (ExecReturn){EXEC_OK, 0};
+}
+
+ExecReturn exec_func_node(ASTNode *node) {
+  if (node == NULL || node->data == NULL)
+    return (ExecReturn){EXEC_FAIL, 0};
+
+  FuncNode *data = node->data;
+
+  double value = run_builtin_func(data->func, data->params, node->line);
+
+  return (ExecReturn){EXEC_OK, value};
 }

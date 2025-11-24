@@ -8,6 +8,7 @@ typedef enum {
   FLOAT,
   DOUBLE,
   VAR_CHAR,
+  VAR,
 } VarType;
 
 extern const char *var_type_strings[];

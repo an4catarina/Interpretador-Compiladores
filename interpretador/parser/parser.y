@@ -6,6 +6,7 @@
 #include "scope.h"
 #include "meta.h"
 #include "error.h"
+#include "func.h"
 int yylex(void);
 void yyerror(const char *s);
 %}
@@ -15,11 +16,13 @@ void yyerror(const char *s);
     char *strValue;
     double doubleValue;
     ASTNode *node;
+    ParamList *params;
+    Builtins func_type;
 }
 
 %token <doubleValue> NUM CHAR
 %token <strValue> VAR_NAME VAR_TYPE
-%token SEMI ";" ATTR "="
+%token SEMI ";" ATTR "=" COMMA ","
 
 %type <node> decl stmt cond
 %type <node> var_decl var_update
@@ -29,6 +32,8 @@ void yyerror(const char *s);
 %type <node> while_stmt do_while_stmt
 %type <node> for_stmt
 %type <node> opt_expr
+%type <params> params param_list
+%type <func_type> func
 
 /* Operadores Condicionais*/
 %token IF "if" ELSE "else"
@@ -56,6 +61,9 @@ void yyerror(const char *s);
 %token CONTINUE "continue"
 
 %token MAIN
+
+/* Funcões */
+%token NODE_TEST_FUNC "test_func"
 
 /* Precedência e associatividade */
 %left PLUS MINUS
@@ -170,10 +178,26 @@ expr:
     | expr "||" expr  { $$ = create_expr_node(EXPR_OR, NULL, $1, $3); }
     | expr "+" expr   { $$ = create_expr_node(EXPR_PLUS, NULL, $1, $3); }
     | expr "-" expr   { $$ = create_expr_node(EXPR_MINUS, NULL, $1, $3); }
+    | func "(" params ")" { $$ = create_func_node($1, $3); }
     | NUM             { $$ = create_expr_node(EXPR_NUM, &$1, NULL, NULL); }
     | CHAR            { $$ = create_expr_node(EXPR_CHAR, &$1, NULL, NULL); }
     | VAR_NAME        { $$ = create_expr_node(EXPR_VAR, $1, NULL, NULL); }
     ;
+
+func: "test_func" { $$ = TEST_FUNC; }
+    ;
+
+params: /* empty */         { $$ = create_param_list(); }
+      | param_list          { $$ = $1; }
+      ;
+
+param_list: NUM          { $$ = create_param_list(); add_param($$, &$1, DOUBLE); }
+          | CHAR         { $$ = create_param_list(); add_param($$, &$1, VAR_CHAR); }
+          | VAR_NAME     { $$ = create_param_list(); add_param($$, $1, VAR); }
+          | param_list "," NUM      { add_param($1, &$3, DOUBLE); $$ = $1; }
+          | param_list "," CHAR     { add_param($1, &$3, VAR_CHAR); $$ = $1; }
+          | param_list "," VAR_NAME { add_param($1, $3, VAR); $$ = $1; }
+          ;
 
 %%
 

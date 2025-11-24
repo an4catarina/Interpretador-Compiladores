@@ -4,6 +4,7 @@
 #include "ast.h"
 #include "utils.h"
 #include "meta.h"
+#include "func.h"
 #include "parser.tab.h"
 #include "error.h"
 %}
@@ -18,6 +19,7 @@ AL  [_a-zA-Z]
 %%
 
 ";" { return SEMI; }
+"," { return COMMA; }
 
 "=" { return ATTR; }
 
@@ -56,6 +58,8 @@ AL  [_a-zA-Z]
     yylval.strValue = strdup(yytext);
     return VAR_TYPE;
 }
+
+"test_func"    { return NODE_TEST_FUNC; }
 
 {AL}{AN}* {
     yylval.strValue = strdup(yytext);

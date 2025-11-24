@@ -54,6 +54,9 @@ typedef enum
   // Break e continue
   NODE_BREAK,
   NODE_CONTINUE,
+
+  // Nós de funções
+  NODE_FUNC,
 } NodeType;
 
 typedef enum

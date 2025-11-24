@@ -1,5 +1,6 @@
 #include "ast_nodes.h"
 #include "ast.h"
+#include "func.h"
 #include "meta.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -56,7 +57,7 @@ void free_var_node(ASTNode *node)
   if (vn->type)
     free(vn->type);
   if (vn->value)
-    free_expr_node(vn->value);
+    free_node(vn->value);
 
   free(vn);
   free(node);
@@ -302,4 +303,43 @@ ASTNode *create_continue_node()
   n->data = NULL;
   n->line = parser_line;
   return n;
+}
+
+ASTNode *create_func_node(Builtins func, ParamList *params)
+{
+  ASTNode *node = malloc(sizeof(ASTNode));
+
+  if (node == NULL)
+    return NULL;
+
+  node->type = NODE_FUNC;
+  node->line = parser_line;
+
+  FuncNode *data = malloc(sizeof(FuncNode));
+
+  if (data == NULL)
+    return NULL;
+
+  data->func = func;
+  data->params = params;
+
+  node->data = data;
+
+  return node;
+}
+
+void free_func_node(ASTNode *node)
+{
+  if (node == NULL)
+    return;
+
+  if (node->data)
+  {
+    FuncNode *data = node->data;
+
+    free_param_list(data->params);
+    free(data);
+  }
+
+  free(node);
 }

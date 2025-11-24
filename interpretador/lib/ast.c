@@ -38,9 +38,11 @@ ExecReturn exec_node(ASTNode *node)
     return (ExecReturn){EXEC_BREAK, 0};
   case NODE_CONTINUE:
     return (ExecReturn){EXEC_CONTINUE, 0};
+  case NODE_FUNC:
+    return exec_func_node(node);
   }
 
-  return (ExecReturn){EXEC_OK, 0};
+  return (ExecReturn){EXEC_FAIL, 0};
 }
 
 void free_node(ASTNode *node)
@@ -66,6 +68,9 @@ void free_node(ASTNode *node)
     break;
   case NODE_FOR:
     free_for_node(node);
+    break;
+  case NODE_FUNC:
+    free_func_node(node);
     break;
   }
 }

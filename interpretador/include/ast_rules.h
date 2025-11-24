@@ -13,10 +13,12 @@ extern ExecReturn exec_expr_node(NodeType type, ASTNode *node);
 
 extern ExecReturn exec_node_list(ListNode *node);
 
-ExecReturn exec_while_node(ASTNode *node);
-ExecReturn exec_do_while_node(ASTNode *node);
-ExecReturn exec_for_node(ASTNode *node);
+extern ExecReturn exec_while_node(ASTNode *node);
+extern ExecReturn exec_do_while_node(ASTNode *node);
+extern ExecReturn exec_for_node(ASTNode *node);
 
 extern ExecReturn exec_if_node(ASTNode *node);
+
+extern ExecReturn exec_func_node(ASTNode *node);
 
 #endif
