@@ -9,13 +9,14 @@ typedef enum {
   DOUBLE,
   VAR_CHAR,
   VAR,
+  VAR_STRING,  /* NOVO: usado apenas em parâmetros (printf) */
 } VarType;
 
 extern const char *var_type_strings[];
 
 typedef struct {
-  char *name;
   VarType type;
+  char *name;
   void *value;
 } Var;
 

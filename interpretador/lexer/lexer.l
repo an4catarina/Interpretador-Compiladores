@@ -34,8 +34,8 @@ AL  [_a-zA-Z]
 "++"            { return INCR; }
 "--"            { return DECR; }
 "%"             { return MOD; }
-"while"         {return WHILE; }
-"do"            {return DO; }
+"while"         { return WHILE; }
+"do"            { return DO; }
 
 "if"            { return IF; }
 "else"          { return ELSE; }
@@ -62,6 +62,12 @@ AL  [_a-zA-Z]
 "test_func"    { return NODE_TEST_FUNC; }
 "pow"          { return NODE_POW_FUNC;  }
 "sqrt"         { return NODE_SQRT_FUNC; }
+"printf"       { return NODE_PRINTF; }
+
+\"([^\"\\]|\\.)*\" {
+    yylval.strValue = strdup(yytext);
+    return STRING;
+}
 
 {AL}{AN}* {
     yylval.strValue = strdup(yytext);
@@ -78,11 +84,12 @@ AL  [_a-zA-Z]
     return CHAR;
 }
 
-[ \t]+    { /* não faz nada */ }
+[ \t]+    { /* ignora */ }
 
-"//".*    { /* Comentário */}
+"//".*    { /* ignora */ }
 
-"int main()" { if (!main_declared) {
+"int main()" {
+               if (!main_declared) {
                  main_declared = 1;
                  return MAIN;
                } else {
@@ -92,7 +99,7 @@ AL  [_a-zA-Z]
 
 \n        { parser_line++; }
 
-.         { /* printf("Caractere não reconhecido: %s\n", yytext); */ }
+.
 
 %%
 
