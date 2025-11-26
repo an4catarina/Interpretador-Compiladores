@@ -3,7 +3,7 @@ import pytest
 from glob import glob
 
 test_files = sorted(glob(f"{tests_path}/while/*.c"))
-expected_return_code = [0, 0, 0]  #  do_while_break_continue,while, do_while, no_block
+expected_return_code = [0, 0, 0, 0, 0]  #  do_while_break_continue,while, do_while, no_block
 expected_output = [
     "[DEBUG] Valor: 7",
     "[DEBUG] Valor: 3",
