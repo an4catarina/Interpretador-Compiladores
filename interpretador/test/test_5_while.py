@@ -1,16 +1,16 @@
-from common import *
-import pytest
 from glob import glob
 
-test_files = sorted(glob(f"{tests_path}/while/*.c"))
-expected_return_code = [0, 0, 0, 0, 0]  #  do_while_break_continue,while, do_while, no_block
-expected_output = [
-    "[DEBUG] Valor: 7",
-    "[DEBUG] Valor: 3",
-    "[DEBUG] Valor: 3",
-    "[DEBUG] Break na linha 13",
-    "[DEBUG] Valor: 3",
+import pytest
+from common import *
 
+test_files = sorted(glob(f"{tests_path}/while/*.c"))
+expected_return_code = [0, 0, 0, 0, 0]
+expected_output = [
+    "[DEBUG] Valor: 3",
+    ["[DEBUG] Continue na linha 9", "[DEBUG] Break na linha 13"],
+    "[DEBUG] Valor: 3",
+    "[DEBUG] Valor: 3",
+    ["[DEBUG] Continue na linha 10", "[DEBUG] Break na linha 13"],
 ]
 
 

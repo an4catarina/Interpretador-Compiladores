@@ -4,15 +4,13 @@
 #include "utils.h"
 #include <stdlib.h>
 
-ExecReturn exec_node(ASTNode *node)
-{
+ExecReturn exec_node(ASTNode *node) {
   if (node == NULL)
     return (ExecReturn){EXEC_FAIL, 0};
 
   NodeType type = node->type;
 
-  switch (type)
-  {
+  switch (type) {
   case VAR_DECL:
     return exec_var_decl(node);
   case VAR_INIT:
@@ -35,9 +33,9 @@ ExecReturn exec_node(ASTNode *node)
   case NODE_FOR:
     return exec_for_node(node);
   case NODE_BREAK:
-    return (ExecReturn){EXEC_BREAK, 0};
+    return (ExecReturn){EXEC_BREAK, node->line};
   case NODE_CONTINUE:
-    return (ExecReturn){EXEC_CONTINUE, 0};
+    return (ExecReturn){EXEC_CONTINUE, node->line};
   case NODE_FUNC:
     return exec_func_node(node);
   }
@@ -45,12 +43,10 @@ ExecReturn exec_node(ASTNode *node)
   return (ExecReturn){EXEC_FAIL, 0};
 }
 
-void free_node(ASTNode *node)
-{
+void free_node(ASTNode *node) {
   NodeType type = node->type;
 
-  switch (type)
-  {
+  switch (type) {
   case VAR_DECL ... VAR_PRINT:
     free_var_node(node);
     break;
