@@ -4,10 +4,11 @@ import pytest
 from common import *
 
 test_files = sorted(glob(f"{tests_path}/for/*.c"))
-expected_return_code = [0, 0]  # for , double_for
+expected_return_code = [0, 0, 0]  # for , double_for , for_break_continue
 expected_output = [
     "[DEBUG] Valor: 5",
     "[DEBUG] Valor: 4",
+    "[DEBUG] Break na linha 10",
 ]
 
 

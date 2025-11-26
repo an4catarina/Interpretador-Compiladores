@@ -246,11 +246,11 @@ ExecReturn exec_node_list(ListNode *node) {
     if (n->node) {
       ret = exec_node(n->node);
       if (ret.status == EXEC_BREAK) {
-        printf("[DEBUG] Break na linha %d\n", n->node->line);
+        printf("[DEBUG] Break na linha %d\n", (int)ret.value);
         break;
       }
       if (ret.status == EXEC_CONTINUE) {
-        printf("[DEBUG] Continue na linha %d\n", n->node->line);
+        printf("[DEBUG] Continue na linha %d\n", (int)ret.value);
         break;
       }
       if (ret.status == EXEC_FAIL) {

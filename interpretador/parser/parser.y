@@ -119,8 +119,9 @@ inner_scope: /* empty */          { $$ = create_node_list(); }
 
 stmt: VAR_NAME[name] { $$ = create_var_node(VAR_PRINT, NULL, $name, NULL); }
     | BREAK  {
-        if (is_loop)
+        if (is_loop) {
           $$ = create_break_node();
+        }
         else
           exit_with_error(BREAK_OUT_OF_LOOP, parser_line);
       }
