@@ -3,16 +3,20 @@ from glob import glob
 import pytest
 from common import *
 
-test_files = sorted(glob(f"{tests_path}/for/*.c"))
-expected_return_code = [0, 0, 0]  # for , double_for , for_break_continue
+test_files = sorted(glob(f"{tests_path}/funcs/*.c"))
+
+expected_return_code = [1, 0, 0, 0, 0]
+
 expected_output = [
-    "[DEBUG] Valor: 5",
-    "[DEBUG] Valor: 4",
-    "[DEBUG] Break na linha 10",
+    "[ERRO] Função invocada incorretamente na linha 5",
+    ["[DEBUG] Valor: 8", "[DEBUG] Valor: 65536"],
+    "",
+    ["[DEBUG] Valor: 3.000000", "[DEBUG] Valor: 3.464102"],
+    "",
 ]
 
 
-class TestFor:
+class TestFuncs:
     @pytest.mark.parametrize(
         "test_file, return_code, output",
         zip(test_files, expected_return_code, expected_output),

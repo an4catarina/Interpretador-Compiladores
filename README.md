@@ -57,8 +57,9 @@ Atualmente foram implementadas as seguintes suítes de testes:
 |  expr   |       8        | Expressões aritméticas                                     |
 | scopes  |       3        | Criação de escopos, uso de variáveis de escopos diferentes |
 | if_else |       7        | Estruturas `if`, `else` e `else if`                        |
-|  while  |       3        | Estruturas `while` e `do while`                            |
-|   for   |       2        | Laço de repetição `for`                                    |
+|  while  |       5        | Estruturas `while` e `do while`                            |
+|   for   |       3        | Laço de repetição `for`                                    |
+|  funcs  |       5        | Invocação de funções builtins                              |
 
 
 ---
@@ -84,3 +85,43 @@ just run # Modo interativo
 
 just run "arquivo.c" # Execução de código fonte
 ```
+
+---
+
+## **Limitações**
+
+Tendo em vista o tempo limitado de desenvolvimento, a equipe limitou o escopo do projeto ao implementar apenas um subconjunto das funcionalidades da linguagem C. Abaixo está uma descrição do que foi e do que não foi implementado durante o desenvolvimento do projeto.
+
+### **Tipos de dados suportados**
+
+- *int*
+- *float*
+- *double*
+- *char*
+- *strings* (apenas como parâmetros de funções)
+
+### **Operações Suportadas**
+
+Todos os operadores do C foram implementados, exceto os operadores bit a bit e os operadores de atribuição além do básico (operador *=*).
+
+### **Estruturas de controle de fluxo suportadas**
+
+- *if*, *else* e *if else*
+- *for*
+- *while* e *do while*
+
+### **Funções builtins suportadas**
+
+Para simplificar a implementação de funções da libc no projeto foi decidido suprimir o uso da diretiva `#include`, efetivamente o interpretador "importa" essas funções por padrão. Abaixo está a lista das funções implementadas:
+
+- *printf*
+- *pow*
+- *sqrt*
+
+### **Funcionalidades não implementadas**
+
+Abaixo serão destacadas algumas funcionalidades que não foram implementadas:
+
+- Arrays e matrizes
+- Ponteiros
+- Declaração de funções

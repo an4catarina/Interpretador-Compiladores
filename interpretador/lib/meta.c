@@ -2,3 +2,4 @@
 
 int parser_line = 1;
 int main_declared = 0;
+int is_loop = 0;

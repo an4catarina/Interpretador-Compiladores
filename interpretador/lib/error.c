@@ -36,6 +36,16 @@ void exit_with_error(const ErrorType e, int line) {
   case MOD_BY_ZERO:
     fprintf(stderr, "[ERRO] Operação de módulo com 0 na linha %d\n", line);
     break;
+  case BREAK_OUT_OF_LOOP:
+    fprintf(stderr, "[ERRO] 'break' fora de loop na linha %d\n", line);
+    break;
+  case CONTINUE_OUT_OF_LOOP:
+    fprintf(stderr, "[ERRO] 'continue' fora de loop na linha %d\n", line);
+    break;
+  case WRONG_FUNC_CALL:
+    fprintf(stderr, "[ERRO] Função invocada incorretamente na linha %d\n",
+            line);
+    break;
   }
   exit(1);
 }

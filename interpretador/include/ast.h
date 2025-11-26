@@ -14,7 +14,6 @@ typedef enum
   // Expressões com um só argumento
   EXPR_NUM,
   EXPR_CHAR,
-  EXPR_VAR,
 
   // Expressões com dois argumentos
   EXPR_PLUS,
@@ -25,8 +24,6 @@ typedef enum
   EXPR_NEQUAL,
   EXPR_MOD,
   EXPR_NEG,
-  EXPR_EQ,
-  EXPR_NE,
   EXPR_LT,
   EXPR_GT,
   EXPR_LE,
@@ -38,11 +35,12 @@ typedef enum
   // Expressão com parenteses
   EXPR_PAR,
 
-  // Expressões unárias
+  // Expressões com variáveis
   EXPR_INC_PREV,
   EXPR_INC_POST,
   EXPR_DEC_PREV,
   EXPR_DEC_POST,
+  EXPR_VAR,
 
   // Nó com lista de nós
   NODE_LIST,
@@ -52,7 +50,22 @@ typedef enum
   NODE_WHILE,
   NODE_DO_WHILE,
   NODE_FOR,
+
+  // Break e continue
+  NODE_BREAK,
+  NODE_CONTINUE,
+
+  // Nós de funções
+  NODE_FUNC,
 } NodeType;
+
+typedef enum
+{
+  EXEC_OK,
+  EXEC_FAIL,
+  EXEC_BREAK,
+  EXEC_CONTINUE,
+} ExecStatus;
 
 typedef struct
 {
@@ -61,7 +74,13 @@ typedef struct
   int line;
 } ASTNode;
 
-extern double exec_node(ASTNode *node);
+typedef struct
+{
+  ExecStatus status;
+  double value;
+} ExecReturn;
+
+extern ExecReturn exec_node(ASTNode *node);
 extern void free_node(ASTNode *node);
 extern ASTNode *create_if_node(ASTNode *condition, ASTNode *if_body,
                                ASTNode *else_body);
