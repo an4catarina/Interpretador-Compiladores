@@ -8,8 +8,9 @@ expected_output = [
     "[DEBUG] Valor: 7",
     "[DEBUG] Valor: 3",
     "[DEBUG] Valor: 3",
-    "[DEBUG] Valor: 3",
     "[DEBUG] Break na linha 13",
+    "[DEBUG] Valor: 3",
+
 ]
 
 
