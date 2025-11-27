@@ -300,3 +300,105 @@ void free_func_node(ASTNode *node) {
 
   free(node);
 }
+
+ASTNode *create_array_decl_node(char *type, char *name, ASTNode *size_expr) {
+  ASTNode *node = malloc(sizeof(ASTNode));
+  ArrayDeclNode *data = malloc(sizeof(ArrayDeclNode));
+
+  node->type = ARR_DECL;
+  node->data = data;
+  node->line = parser_line;
+
+  data->type = NULL;
+  data->name = NULL;
+  data->size_expr = size_expr;
+
+  if (type != NULL) {
+    data->type = malloc(strlen(type) + 1);
+    strcpy(data->type, type);
+  }
+
+  if (name != NULL) {
+    data->name = malloc(strlen(name) + 1);
+    strcpy(data->name, name);
+  }
+
+  return node;
+}
+
+ASTNode *create_array_elem_assign_node(char *name, ASTNode *index, ASTNode *value) {
+  ASTNode *node = malloc(sizeof(ASTNode));
+  ArrayElemNode *data = malloc(sizeof(ArrayElemNode));
+
+  node->type = ARR_ELEM_ASSIGN;
+  node->data = data;
+  node->line = parser_line;
+
+  data->name = NULL;
+  data->index = index;
+  data->value = value;
+
+  if (name != NULL) {
+    data->name = malloc(strlen(name) + 1);
+    strcpy(data->name, name);
+  }
+
+  return node;
+}
+
+ASTNode *create_array_access_node(char *name, ASTNode *index) {
+  ASTNode *node = malloc(sizeof(ASTNode));
+  ArrayElemNode *data = malloc(sizeof(ArrayElemNode));
+
+  node->type = EXPR_ARRAY_ACCESS;
+  node->data = data;
+  node->line = parser_line;
+
+  data->name = NULL;
+  data->index = index;
+  data->value = NULL;
+
+  if (name != NULL) {
+    data->name = malloc(strlen(name) + 1);
+    strcpy(data->name, name);
+  }
+
+  return node;
+}
+
+void free_array_decl_node(ASTNode *node) {
+  if (node == NULL)
+    return;
+
+  if (node->data) {
+    ArrayDeclNode *data = node->data;
+    if (data->type)
+      free(data->type);
+    if (data->name)
+      free(data->name);
+    if (data->size_expr)
+      free_node(data->size_expr);
+    free(data);
+  }
+
+  free(node);
+}
+
+void free_array_elem_node(ASTNode *node) {
+  if (node == NULL)
+    return;
+
+  if (node->data) {
+    ArrayElemNode *data = node->data;
+    if (data->name)
+      free(data->name);
+    if (data->index)
+      free_node(data->index);
+    if (data->value)
+      free_node(data->value);
+    free(data);
+  }
+
+  free(node);
+}
+

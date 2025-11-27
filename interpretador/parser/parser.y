@@ -71,6 +71,7 @@ static char *strip_quotes(const char *parser_str) {
 
 %token LPAREN "(" RPAREN ")"
 %token LBRACK "{" RBRACK "}"
+%token LBRACKET "[" RBRACKET "]"
 
 %token WHILE "while"
 %token DO "do"
@@ -87,14 +88,16 @@ static char *strip_quotes(const char *parser_str) {
 %token NODE_SQRT_FUNC "sqrt"
 %token NODE_PRINTF    "printf"
 
-/* Precedência e associatividade */
-%left PLUS MINUS
-%left TIMES DIVIDE MOD
+/* Precedência e associatividade (da menor para a maior) */
+%left OR
+%left AND
 %left EQ NE
 %left LT GT LE GE
-%left AND OR
-%right INCR DECR
+%left PLUS MINUS
+%left TIMES DIVIDE MOD
 %right NOT
+%right INCR DECR
+%nonassoc LBRACKET RBRACKET
 
 %start program
 
@@ -102,7 +105,8 @@ static char *strip_quotes(const char *parser_str) {
 
 program:
        | program decl ";"   { exec_node($2); free_node($2); }
-       | program MAIN scope { exec_node($3); free_node($3); }
+       | program MAIN "{" { stack_scope(); } 
+         inner_scope "}" { exec_node($5); free_node($5); pop_scope(); }
        ;
 
 scope: "{" inner_scope "}" { $$ = $2; };
@@ -179,19 +183,31 @@ decl: var_decl   { $$ = $1; }
 
 var_decl: VAR_TYPE[type] VAR_NAME[name] {
             $$ = create_var_node(VAR_DECL, $type, $name, NULL);
-		      }
+	      }
         | error VAR_NAME[name] { exit_with_error(DECL_INVALID_TYPE, parser_line); }
         | VAR_TYPE[type] VAR_NAME[name] "=" expr {
             $$ = create_var_node(VAR_INIT, $type, $name, $expr);
           }
         | error VAR_NAME[name] "=" expr { exit_with_error(INIT_INVALID_TYPE, parser_line); }
+        | VAR_TYPE[type] VAR_NAME[name] "[" NUM[size] "]" {
+            if (strcmp($type, "int") != 0) {
+              exit_with_error(DECL_INVALID_TYPE, parser_line);
+            }
+
+            ASTNode *size_node = create_expr_node(EXPR_NUM, &$size, NULL, NULL);
+
+            $$ = create_array_decl_node($type, $name, size_node);
+          }
         ;
 
-var_update: VAR_NAME[name] "=" expr {
+
+var_update: VAR_NAME[name] "[" expr[index] "]" "=" expr[value] {
+              $$ = create_array_elem_assign_node($name, $index, $value);
+            }
+          | VAR_NAME[name] "=" expr {
               $$ = create_var_node(VAR_UPDATE, NULL, $name, $expr);
             }
           ;
-
 expr:
       "(" expr ")"    { $$ = create_expr_node(EXPR_PAR, NULL, $2, NULL); }
     | VAR_NAME "++"   { $$ = create_expr_node(EXPR_INC_POST, $1, NULL, NULL); }
@@ -217,6 +233,7 @@ expr:
     | NUM             { $$ = create_expr_node(EXPR_NUM, &$1, NULL, NULL); }
     | CHAR            { $$ = create_expr_node(EXPR_CHAR, &$1, NULL, NULL); }
     | VAR_NAME        { $$ = create_expr_node(EXPR_VAR, $1, NULL, NULL); }
+    | VAR_NAME "[" expr "]" %prec LBRACKET { $$ = create_array_access_node($1, $3); }
     ;
 
 func: "test_func" { $$ = TEST_FUNC; }

@@ -121,6 +121,97 @@ ExecReturn exec_var_update(ASTNode *node) {
   return (ExecReturn){EXEC_FAIL, 0};
 }
 
+
+ExecReturn exec_array_decl(ASTNode *node) {
+  if (node == NULL || node->data == NULL)
+    return (ExecReturn){EXEC_FAIL, 0};
+
+  ArrayDeclNode *data = node->data;
+  char *type = data->type;
+  char *name = data->name;
+
+  if (type == NULL || strcmp(type, "int") != 0) {
+    exit_with_error(DECL_INVALID_TYPE, node->line);
+    return (ExecReturn){EXEC_FAIL, 0};
+  }
+
+  ExecReturn size_ret = exec_node(data->size_expr);
+  if (size_ret.status != EXEC_OK)
+    return size_ret;
+
+  int length = (int)size_ret.value;
+  if (length <= 0) {
+    exit_with_error(UNKNOWN_VAR, node->line);
+    return (ExecReturn){EXEC_FAIL, 0};
+  }
+
+  bool success = add_int_array(name, length);
+  if (!success) {
+    exit_with_error(VAR_REDECLARATION, node->line);
+    return (ExecReturn){EXEC_FAIL, 0};
+  }
+
+  printf("[DEBUG] Declaração de array int: %s[%d]\n", name, length);
+  return (ExecReturn){EXEC_OK, 0};
+}
+
+ExecReturn exec_array_elem_assign(ASTNode *node) {
+  if (node == NULL || node->data == NULL)
+    return (ExecReturn){EXEC_FAIL, 0};
+
+  ArrayElemNode *data = node->data;
+
+  Var *var = get_var(data->name);
+  if (var == NULL || var->type != INT_ARRAY) {
+    exit_with_error(UNKNOWN_VAR, node->line);
+    return (ExecReturn){EXEC_FAIL, 0};
+  }
+
+  ExecReturn idx_ret = exec_node(data->index);
+  if (idx_ret.status != EXEC_OK)
+    return idx_ret;
+  int index = (int)idx_ret.value;
+
+  ExecReturn val_ret = exec_node(data->value);
+  if (val_ret.status != EXEC_OK)
+    return val_ret;
+  double value = val_ret.value;
+
+  if (!set_int_array_elem(var, index, value)) {
+    exit_with_error(UNKNOWN_VAR, node->line);
+    return (ExecReturn){EXEC_FAIL, 0};
+  }
+
+  printf("[DEBUG] Atribuição em array: %s[%d]\n", data->name, index);
+  return (ExecReturn){EXEC_OK, 0};
+}
+
+ExecReturn exec_expr_array_access(ASTNode *node) {
+  if (node == NULL || node->data == NULL)
+    return (ExecReturn){EXEC_FAIL, 0};
+
+  ArrayElemNode *data = node->data;
+
+  Var *var = get_var(data->name);
+  if (var == NULL || var->type != INT_ARRAY) {
+    exit_with_error(UNKNOWN_VAR, node->line);
+    return (ExecReturn){EXEC_FAIL, 0};
+  }
+
+  ExecReturn idx_ret = exec_node(data->index);
+  if (idx_ret.status != EXEC_OK)
+    return idx_ret;
+  int index = (int)idx_ret.value;
+
+  double value;
+  if (!get_int_array_elem(var, index, &value)) {
+    exit_with_error(UNKNOWN_VAR, node->line);
+    return (ExecReturn){EXEC_FAIL, 0};
+  }
+
+  return (ExecReturn){EXEC_OK, value};
+}
+
 ExecReturn exec_expr_node(NodeType type, ASTNode *node) {
   switch (type) {
   case EXPR_NUM ... EXPR_CHAR:
@@ -131,6 +222,8 @@ ExecReturn exec_expr_node(NodeType type, ASTNode *node) {
     return exec_operator_expr(type, node);
   case EXPR_INC_PREV ... EXPR_VAR:
     return exec_variable_expr(type, node);
+  case EXPR_ARRAY_ACCESS:
+    return exec_expr_array_access(node);
   default:
     return (ExecReturn){EXEC_OK, 0};
   }

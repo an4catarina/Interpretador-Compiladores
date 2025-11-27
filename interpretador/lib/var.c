@@ -9,6 +9,7 @@ const char *var_type_strings[] = {
     [FLOAT] = "float",
     [DOUBLE] = "double",
     [VAR_CHAR] = "char",
+    [INT_ARRAY] = "int[]",
 };
 
 VarList *create_var_list() {
@@ -95,6 +96,9 @@ bool add_var(VarType type, char *name, void *value) {
     if (value != NULL)
       memcpy(var->value, value, sizeof(char));
     break;
+  case INT_ARRAY:  // ADICIONE ESTE CASO
+    var->value = value;  // Já é um ponteiro para IntArray
+    break;
   default:
     break;
   }
@@ -131,3 +135,68 @@ bool update_var(VarType type, Var *var, void *value) {
 
   return false;
 }
+
+
+bool add_int_array(char *name, int length) {
+  if (length <= 0) {
+    return false;
+  }
+
+  IntArray *arr = malloc(sizeof(IntArray));
+  if (arr == NULL) {
+    return false;
+  }
+
+  arr->length = length;
+  arr->data = malloc(sizeof(int) * (size_t)length);
+  if (arr->data == NULL) {
+    free(arr);
+    return false;
+  }
+
+  for (int i = 0; i < length; i++) {
+    arr->data[i] = 0;
+  }
+
+  if (!add_var(INT_ARRAY, name, arr)) {
+    free(arr->data);
+    free(arr);
+    return false;
+  }
+
+  return true;
+}
+
+IntArray *get_int_array(Var *var) {
+  if (var == NULL || var->type != INT_ARRAY || var->value == NULL) {
+    return NULL;
+  }
+  return (IntArray *)var->value;
+}
+
+bool get_int_array_elem(Var *var, int index, double *out_value) {
+  IntArray *arr = get_int_array(var);
+  if (arr == NULL || out_value == NULL) {
+    return false;
+  }
+  if (index < 0 || index >= arr->length) {
+    return false;
+  }
+
+  *out_value = (double)arr->data[index];
+  return true;
+}
+
+bool set_int_array_elem(Var *var, int index, double value) {
+  IntArray *arr = get_int_array(var);
+  if (arr == NULL) {
+    return false;
+  }
+  if (index < 0 || index >= arr->length) {
+    return false;
+  }
+
+  arr->data[index] = (int)value;
+  return true;
+}
+

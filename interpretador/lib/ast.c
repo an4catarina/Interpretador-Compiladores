@@ -20,7 +20,11 @@ ExecReturn exec_node(ASTNode *node) {
   case VAR_PRINT:
     print_var(node);
     return (ExecReturn){EXEC_OK, 0};
-  case EXPR_NUM ... EXPR_VAR:
+  case ARR_DECL:
+    return exec_array_decl(node);
+  case ARR_ELEM_ASSIGN:
+    return exec_array_elem_assign(node);
+  case EXPR_NUM ... EXPR_ARRAY_ACCESS:
     return exec_expr_node(node->type, node);
   case NODE_LIST:
     return exec_node_list(node->data);
@@ -53,8 +57,17 @@ void free_node(ASTNode *node) {
   case EXPR_NUM ... EXPR_VAR:
     free_expr_node(node);
     break;
+  case EXPR_ARRAY_ACCESS:
+    free_array_elem_node(node);
+    break;
   case NODE_LIST:
     free_list_node(node);
+    break;
+  case ARR_DECL:
+    free_array_decl_node(node);
+    break;
+  case ARR_ELEM_ASSIGN:
+    free_array_elem_node(node);
     break;
   case NODE_IF:
     free_if_node(node);
