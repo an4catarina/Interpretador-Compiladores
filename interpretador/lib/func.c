@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdint.h>
 
 ParamList *create_param_list() {
   ParamList *list = malloc(sizeof(ParamList));
@@ -100,6 +101,7 @@ double get_param_value(ParamList *list, int n, int line) {
 static double test_func(ParamList *list, int line);
 static double pow_func(ParamList *list, int line);
 static double sqrt_func(ParamList *list, int line);
+static double printf_func(ParamList *list, int line); 
 
 double run_builtin_func(Builtins func, ParamList *list, int line) {
   double result = 0;
@@ -111,6 +113,8 @@ double run_builtin_func(Builtins func, ParamList *list, int line) {
     return pow_func(list, line);
   case SQRT_FUNC:
     return sqrt_func(list, line);
+  case PRINTF:
+    return printf_func(list, line);
   }
 
   return result;
@@ -142,4 +146,82 @@ static double sqrt_func(ParamList *list, int line) {
   double n = get_param_value(list, 1, line);
 
   return sqrt(n);
+}
+
+static double printf_func(ParamList *list, int line) {
+  if (list->len < 1) {
+    exit_with_error(WRONG_FUNC_CALL, line);
+  }
+
+  Param *format_param = list->next;
+  if (format_param->type != VAR) {
+    exit_with_error(WRONG_FUNC_CALL, line);
+  }
+
+  char *format = (char *)format_param->value;
+  
+  if (!format) {
+    exit_with_error(WRONG_FUNC_CALL, line);
+  }
+  
+  int arg_index = 2;
+  size_t i = 0;
+  size_t len = strlen(format);
+  
+  while (i < len) {
+    if (format[i] == '\\' && (i + 1) < len) {
+      i++;
+      switch (format[i]) {
+        case 'n': putchar('\n'); break;
+        case 't': putchar('\t'); break;
+        case '\\': putchar('\\'); break;
+        case 'r': putchar('\r'); break;
+        default: putchar(format[i]); break;
+      }
+      i++;
+    } else if (format[i] == '%' && (i + 1) < len) {
+      i++;
+      if (format[i] == '%') {
+        putchar('%');
+        i++;
+      } else {
+        if (arg_index > list->len) {
+          fprintf(stderr, "Número incorreto de argumentos em printf\n");
+          exit(1);
+        }
+        
+        double value = get_param_value(list, arg_index, line);
+        
+        switch (format[i]) {
+          case 'd':
+          case 'i':
+            printf("%d", (int)value);
+            break;
+          case 'f':
+            printf("%f", value);
+            break;
+          case 'c':
+            putchar((char)value);
+            break;
+          default:
+            putchar('%');
+            putchar(format[i]);
+            break;
+        }
+        
+        arg_index++;
+        i++;
+      }
+    } else {
+      putchar(format[i]);
+      i++;
+    }
+  }
+  
+  if (arg_index <= list->len) {
+    fprintf(stderr, "Número incorreto de argumentos em printf\n");
+    exit(1);
+  }
+  
+  return 0;
 }
