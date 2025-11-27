@@ -8,29 +8,12 @@
 #include "meta.h"
 #include "error.h"
 #include "func.h"
+#include "utils.h"
+
 int yylex(void);
 void yyerror(const char *s);
-
-static char *strip_quotes(const char *parser_str) {
-  if (parser_str == NULL)
-    return NULL;
-
-  size_t len = strlen(parser_str);
-  if (len < 2)
-    return strdup(parser_str);
-
-  char *str = malloc(len - 1);
-  if (!str)
-    return NULL;
-
-  strncpy(str, parser_str + 1, len - 2);
-  str[len - 2] = '\0';
-
-  return str;
-}
 %}
 
-/* Define valor semântico (intValue) */
 %union {
     char *strValue;
     double doubleValue;
@@ -43,7 +26,7 @@ static char *strip_quotes(const char *parser_str) {
 %token <strValue> VAR_NAME VAR_TYPE STRING
 %token SEMI ";" ATTR "=" COMMA ","
 
-%type <node> decl stmt cond loop
+%type <node> decl stmt cond
 %type <node> var_decl var_update
 %type <node> scope inner_scope
 %type <node> expr
@@ -54,32 +37,22 @@ static char *strip_quotes(const char *parser_str) {
 %type <params> params param_list
 %type <func_type> func
 
-/* Operadores Condicionais*/
 %token IF "if" ELSE "else"
-
-/* Operações */
 %token PLUS "+" MINUS "-"
 %token TIMES "*" DIVIDE "/" MOD "%"
-
-/* Operações lógicas */
 %token EQ "==" NE "!="
 %token LT "<" GT ">" LE "<=" GE ">="
 %token AND "&&" OR "||" NOT "!"
-
-/* Operadores unarios*/
 %token INCR "++" DECR "--"
-
 %token LPAREN "(" RPAREN ")"
 %token LBRACK "{" RBRACK "}"
 %token LBRACKET "[" RBRACKET "]"
 
 %token WHILE "while"
 %token DO "do"
-
 %token FOR "for"
 %token BREAK "break"
 %token CONTINUE "continue"
-
 %token MAIN
 
 /* Funcões */
@@ -105,42 +78,28 @@ static char *strip_quotes(const char *parser_str) {
 
 program:
        | program decl ";"   { exec_node($2); free_node($2); }
-       | program MAIN "{" { stack_scope(); } 
+       | program MAIN "{" { stack_scope(); }
          inner_scope "}" { exec_node($5); free_node($5); pop_scope(); }
        ;
 
 scope: "{" inner_scope "}" { $$ = $2; };
 
-inner_scope: /* empty */          { $$ = create_node_list(); }
+inner_scope:
+             { $$ = create_node_list(); }
            | inner_scope stmt ";" { add_list_node($1, $2); $$ = $1; }
            | inner_scope decl ";" { add_list_node($1, $2); $$ = $1; }
            | inner_scope cond     { add_list_node($1, $2); $$ = $1; }
-           | inner_scope { is_loop++; }
-             loop        { add_list_node($1, $3); $$ = $1; is_loop--; }
            | inner_scope expr ";" { add_list_node($1, $2); $$ = $1; }
            | inner_scope scope    { add_list_node($1, $2); $$ = $1; }
            ;
 
 stmt: VAR_NAME[name] { $$ = create_var_node(VAR_PRINT, NULL, $name, NULL); }
-    | BREAK  {
-        if (is_loop) {
-          $$ = create_break_node();
-        }
-        else
-          exit_with_error(BREAK_OUT_OF_LOOP, parser_line);
-      }
-    | CONTINUE {
-        if (is_loop)
-          $$ = create_continue_node();
-        else
-          exit_with_error(CONTINUE_OUT_OF_LOOP, parser_line);
-      }
+    | BREAK           { $$ = create_break_node(); }
+    | CONTINUE        { $$ = create_continue_node(); }
     ;
 
 cond: if_stmt       { $$ = $1; }
-    ;
-
-loop: while_stmt    { $$ = $1; }
+    | while_stmt    { $$ = $1; }
     | do_while_stmt { $$ = $1; }
     | for_stmt      { $$ = $1; }
     ;
@@ -150,25 +109,25 @@ if_stmt: "if" "(" expr ")" decl ";" else_stmt { $$ = create_if_node($3, $5, $7);
        | "if" "(" expr ")" scope else_stmt    { $$ = create_if_node($3, $5, $6); }
        ;
 
-else_stmt: { $$ = NULL; }
+else_stmt:
+           { $$ = NULL; }
          | "else" decl ";" { $$ = $2; }
          | "else" stmt ";" { $$ = $2; }
          | "else" scope    { $$ = $2; }
          | "else" if_stmt  { $$ = $2; }
          ;
 
-while_stmt: "while" "(" expr ")" scope    { $$ = create_while_node($3, $5, true); }
-          | "while" "(" expr ")" decl ";" { $$ = create_while_node($3, $5, true); }
-          | "while" "(" expr ")" stmt ";" { $$ = create_while_node($3, $5, true); }
+while_stmt: "while" "(" expr ")" scope    { $$ = create_while_node($3, $5, 1); }
+          | "while" "(" expr ")" decl ";" { $$ = create_while_node($3, $5, 1); }
+          | "while" "(" expr ")" stmt ";" { $$ = create_while_node($3, $5, 1); }
           ;
 
-do_while_stmt: "do" scope "while" "(" expr ")" ";" { $$ = create_while_node($5, $2, false); }
+do_while_stmt: "do" scope "while" "(" expr ")" ";" { $$ = create_while_node($5, $2, 0); }
 
 for_stmt:
       "for" "(" opt_expr ";" opt_expr ";" opt_expr ")" scope { $$ = create_for_node($3, $5, $7, $9); }
     | "for" "(" opt_expr ";" opt_expr ";" opt_expr ")" stmt  { $$ = create_for_node($3, $5, $7, $9); }
     | "for" "(" opt_expr ";" opt_expr ";" opt_expr ")" decl  { $$ = create_for_node($3, $5, $7, $9); }
-    | "for" { printf("okay\n"); }
     ;
 
 opt_expr:
@@ -242,9 +201,10 @@ func: "test_func" { $$ = TEST_FUNC; }
     | "printf"    { $$ = PRINTF; }
     ;
 
-params: /* empty */         { $$ = create_param_list(); }
-      | param_list          { $$ = $1; }
-      ;
+params:
+      { $$ = create_param_list(); }
+    | param_list { $$ = $1; }
+    ;
 
 param_list: NUM      { $$ = create_param_list(); add_param($$, &$1, DOUBLE); }
           | CHAR     { $$ = create_param_list(); add_param($$, &$1, VAR_CHAR); }

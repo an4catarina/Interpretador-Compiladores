@@ -5,6 +5,25 @@
 #include "var.h"
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
+
+char *strip_quotes(const char *parser_str) {
+  if (parser_str == NULL)
+    return NULL;
+
+  size_t len = strlen(parser_str);
+  if (len < 2)
+    return strdup(parser_str);
+
+  char *str = malloc(len - 1);
+  if (!str)
+    return NULL;
+
+  strncpy(str, parser_str + 1, len - 2);
+  str[len - 2] = '\0';
+
+  return str;
+}
 
 double convert_char(char *c) {
   double value;
@@ -58,22 +77,26 @@ void print_var(ASTNode *node) {
     printf("[DEBUG] Tipo: %s\n", var_type_strings[type]);
 
     switch (type) {
-    case INT:
+    case INT: {
       int *int_value = value;
       printf("[DEBUG] Valor: %d\n", *int_value);
       break;
-    case FLOAT:
+    }
+    case FLOAT: {
       float *float_value = value;
       printf("[DEBUG] Valor: %f\n", *float_value);
       break;
-    case DOUBLE:
+    }
+    case DOUBLE: {
       double *double_value = value;
       printf("[DEBUG] Valor: %lf\n", *double_value);
       break;
-    case VAR_CHAR:
+    }
+    case VAR_CHAR: {
       char *char_value = value;
       printf("[DEBUG] Valor: '%c'\n", *char_value);
       break;
+    }
     default:
       printf("[DEBUG] Variável inválida\n");
       break;
@@ -91,22 +114,26 @@ double get_var_value(char *name, int line) {
     double v;
 
     switch (type) {
-    case INT:
+    case INT: {
       int *int_value = value;
       v = *int_value;
       break;
-    case FLOAT:
+    }
+    case FLOAT: {
       float *float_value = value;
       v = *float_value;
       break;
-    case DOUBLE:
+    }
+    case DOUBLE: {
       double *double_value = value;
       v = *double_value;
       break;
-    case VAR_CHAR:
+    }
+    case VAR_CHAR: {
       char *char_value = value;
       v = *char_value;
       break;
+    }
     }
 
     return v;

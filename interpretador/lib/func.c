@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdint.h>
 
 ParamList *create_param_list() {
   ParamList *list = malloc(sizeof(ParamList));
@@ -137,7 +138,6 @@ double run_builtin_func(Builtins func, ParamList *list, int line) {
     return sqrt_func(list, line);
   case PRINTF:
     return printf_func(list, line);
-    break;
   }
 
   return result;
@@ -170,125 +170,80 @@ static double sqrt_func(ParamList *list, int line) {
 
   return sqrt(n);
 }
+
 static double printf_func(ParamList *list, int line) {
-  if (list == NULL || list->next == NULL)
-    return 0;
-
-  Param *first = list->next;
-  char *fmt = (char *)first->value;
-
-  if (fmt == NULL) {
-    fprintf(stderr, "String de formato nula em printf na linha %d\n", line);
-    exit(1);
+  if (list->len < 1) {
+    exit_with_error(WRONG_FUNC_CALL, line);
   }
 
-  size_t len = strlen(fmt);
+  Param *format_param = list->next;
+  if (format_param->type != VAR) {
+    exit_with_error(WRONG_FUNC_CALL, line);
+  }
 
-  int conv_count = 0;
-  for (size_t i = 0; i < len; i++) {
-    char c = fmt[i];
+  char *format = (char *)format_param->value;
 
-    if (c == '%') {
-      if (i + 1 < len) {
-        char c2 = fmt[i + 1];
-        if (c2 == 'd' || c2 == 'f' || c2 == 'c') {
-          conv_count++;
-          i++;
-        } else if (c2 == '%') {
-          i++;
-        } else {
+  if (!format) {
+    exit_with_error(WRONG_FUNC_CALL, line);
+  }
+
+  int arg_index = 2;
+  size_t i = 0;
+  size_t len = strlen(format);
+
+  while (i < len) {
+    if (format[i] == '\\' && (i + 1) < len) {
+      i++;
+      switch (format[i]) {
+        case 'n': putchar('\n'); break;
+        case 't': putchar('\t'); break;
+        case '\\': putchar('\\'); break;
+        case 'r': putchar('\r'); break;
+        default: putchar(format[i]); break;
+      }
+      i++;
+    } else if (format[i] == '%' && (i + 1) < len) {
+      i++;
+      if (format[i] == '%') {
+        putchar('%');
+        i++;
+      } else {
+        if (arg_index > list->len) {
+          fprintf(stderr, "[ERRO] Número incorreto de argumentos em printf\n");
+          exit(1);
         }
+
+        double value = get_param_value(list, arg_index, line);
+
+        switch (format[i]) {
+          case 'd':
+          case 'i':
+            printf("%d", (int)value);
+            break;
+          case 'f':
+            printf("%f", value);
+            break;
+          case 'c':
+            putchar((char)value);
+            break;
+          default:
+            putchar('%');
+            putchar(format[i]);
+            break;
+        }
+
+        arg_index++;
+        i++;
       }
+    } else {
+      putchar(format[i]);
+      i++;
     }
   }
 
-  int expected_args = list->len - 1;
-
-  if (conv_count != expected_args) {
-    fprintf(stderr,
-            "Número incorreto de argumentos em printf na linha %d "
-            "(esperados: %d, recebidos: %d)\n",
-            line, conv_count, expected_args);
+  if (arg_index <= list->len) {
+    fprintf(stderr, "[ERRO] Número incorreto de argumentos em printf\n");
     exit(1);
-  }
-
-  int p = 2;
-  for (size_t i = 0; i < len; i++) {
-    char c = fmt[i];
-
-    if (c == '\\') {
-      if (i + 1 >= len) {
-        putchar('\\');
-        break;
-      }
-
-      i++;
-      char c2 = fmt[i];
-
-      switch (c2) {
-      case 'n':
-        putchar('\n');
-        break;
-      case 't':
-        putchar('\t');
-        break;
-      case '\\':
-        putchar('\\');
-        break;
-      case '"':
-        putchar('"');
-        break;
-      case '%':
-        putchar('%');
-        break;
-      case '0':
-        putchar('\0');
-        break;
-      default:
-        putchar(c2);
-        break;
-      }
-
-      continue;
-    }
-
-    if (c == '%') {
-      if (i + 1 >= len) {
-        putchar('%');
-        break;
-      }
-
-      i++;
-      char c2 = fmt[i];
-
-      switch (c2) {
-      case 'd': {
-        double v = get_param_value(list, p++, line);
-        printf("%d", (int)v);
-        break;
-      }
-      case 'f': {
-        double v = get_param_value(list, p++, line);
-        printf("%f", v);
-        break;
-      }
-      case 'c': {
-        double v = get_param_value(list, p++, line);
-        printf("%c", (char)v);
-        break;
-      }
-      case '%':
-        putchar('%');
-        break;
-      default:
-        putchar('%');
-        putchar(c2);
-        break;
-      }
-
-      continue;
-    }
-    putchar(c);
   }
 
   return 0;
