@@ -186,7 +186,7 @@ static double printf_func(ParamList *list, int line) {
         i++;
       } else {
         if (arg_index > list->len) {
-          fprintf(stderr, "Número incorreto de argumentos em printf\n");
+          fprintf(stderr, "[ERRO] Número incorreto de argumentos em printf\n");
           exit(1);
         }
         
@@ -219,7 +219,7 @@ static double printf_func(ParamList *list, int line) {
   }
   
   if (arg_index <= list->len) {
-    fprintf(stderr, "Número incorreto de argumentos em printf\n");
+    fprintf(stderr, "[ERRO] Número incorreto de argumentos em printf\n");
     exit(1);
   }
   
