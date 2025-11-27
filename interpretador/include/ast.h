@@ -41,6 +41,7 @@ typedef enum
   EXPR_DEC_PREV,
   EXPR_DEC_POST,
   EXPR_VAR,
+  EXPR_ARRAY_ACCESS,
 
   // Nó com lista de nós
   NODE_LIST,
@@ -54,6 +55,10 @@ typedef enum
   // Break e continue
   NODE_BREAK,
   NODE_CONTINUE,
+
+  // Arrays
+  ARR_DECL,
+  ARR_ELEM_ASSIGN,
 
   // Nós de funções
   NODE_FUNC,

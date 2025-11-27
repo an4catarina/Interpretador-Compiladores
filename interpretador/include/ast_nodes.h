@@ -79,6 +79,25 @@ extern void free_while_node(ASTNode *node);
 extern ASTNode *create_break_node();
 extern ASTNode *create_continue_node();
 
+typedef struct {
+  char *type;
+  char *name;
+  ASTNode *size_expr;
+} ArrayDeclNode;
+
+typedef struct {
+  char *name;
+  ASTNode *index;
+  ASTNode *value;
+} ArrayElemNode;
+
+// Funções de arrays
+ASTNode *create_array_decl_node(char *type, char *name, ASTNode *size_expr);
+ASTNode *create_array_elem_assign_node(char *name, ASTNode *index, ASTNode *value);
+ASTNode *create_array_access_node(char *name, ASTNode *index);
+void free_array_decl_node(ASTNode *node);
+void free_array_elem_node(ASTNode *node);
+
 // Funções ListNode
 extern ASTNode *create_node_list();
 extern void add_list_node(ASTNode *list, ASTNode *node);
