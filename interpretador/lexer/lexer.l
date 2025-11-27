@@ -62,9 +62,15 @@ AL  [_a-zA-Z]
 }
 
 "test_func"    { return NODE_TEST_FUNC; }
+"printf"       { return NODE_PRINTF; } 
 "pow"          { return NODE_POW_FUNC;  }
 "sqrt"         { return NODE_SQRT_FUNC; }
 "printf"       { return NODE_PRINTF; }
+
+\"([^\"\\]|\\.)*\" {
+    yylval.strValue = strdup(yytext);
+    return STRING;
+}
 
 \"([^\"\\]|\\.)*\" {
     yylval.strValue = strdup(yytext);
