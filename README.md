@@ -59,7 +59,8 @@ Atualmente foram implementadas as seguintes suítes de testes:
 | if_else |       7        | Estruturas `if`, `else` e `else if`                        |
 |  while  |       5        | Estruturas `while` e `do while`                            |
 |   for   |       3        | Laço de repetição `for`                                    |
-|  funcs  |       5        | Invocação de funções builtins                              |
+|  funcs  |       9        | Invocação de funções builtins                              |
+| arrays  |       5        | Criação e uso de arrays                                    |
 
 
 ---
@@ -122,6 +123,6 @@ Para simplificar a implementação de funções da libc no projeto foi decidido 
 
 Abaixo serão destacadas algumas funcionalidades que não foram implementadas:
 
-- Arrays e matrizes
+- Matrizes
 - Ponteiros
 - Declaração de funções
