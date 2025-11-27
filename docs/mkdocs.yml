@@ -1,10 +1,17 @@
 site_name: Interpretador de C - Documentação
+site_url: https://an4catarina.github.io/Interpretador-Compiladores/
+repo_url: https://github.com/an4catarina/Interpretador-Compiladores
+repo_name: Interpretador-Compiladores
+
 theme:
   name: material
   language: pt-BR
   features:
     - navigation.tabs
     - navigation.tabs.sticky
+    - navigation.top
+    - search.highlight
+    - search.share
 
 nav:
   - Home: index.md
@@ -23,3 +30,12 @@ nav:
   - O interpretador:
       - Como rodar o projeto: interpretador/comoRodar.md
       - Glossário de termos: interpretador/glossarioTermos.md
+
+markdown_extensions:
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.superfences
+  - pymdownx.inlinehilite
+  - admonition
+  - pymdownx.details
+  - tables
