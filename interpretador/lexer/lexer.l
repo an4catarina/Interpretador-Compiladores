@@ -31,6 +31,8 @@ AL  [_a-zA-Z]
 ")"             { return RPAREN; }
 "{"             { return LBRACK; }
 "}"             { return RBRACK; }
+"["             { return LBRACKET; }
+"]"             { return RBRACKET; }
 "++"            { return INCR; }
 "--"            { return DECR; }
 "%"             { return MOD; }
@@ -74,7 +76,7 @@ AL  [_a-zA-Z]
     return VAR_NAME;
 }
 
-[+-]?{N}+(\.{N}+)?  {
+{N}+(\.{N}+)?  {
     yylval.doubleValue = atof(yytext);
     return NUM;
 }
