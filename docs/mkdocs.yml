@@ -27,6 +27,16 @@ nav:
       - Sprint 3:
           - Cronograma da sprint: sprints/sprint3/cronograma.md
           - Descrição da Sprint: sprints/sprint3/desc_sprint3.md
+      - Sprint 4:
+          - Cronograma da sprint: sprints/sprint4/cronograma.md
+          - Descrição da Sprint: sprints/sprint4/desc_sprint4.md
+      - Sprint 5:
+          - Cronograma da sprint: sprints/sprint5/cronograma.md
+          - Descrição da Sprint: sprints/sprint5/desc_sprint5.md
+      - Sprint 6:
+          - Cronograma da sprint: sprints/sprint6/cronograma.md
+          - Descrição da Sprint: sprints/sprint6/desc_sprint6.md
+
   - O interpretador:
       - Como rodar o projeto: interpretador/comoRodar.md
       - Glossário de termos: interpretador/glossarioTermos.md
