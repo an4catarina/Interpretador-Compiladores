@@ -3,6 +3,9 @@ site_url: https://an4catarina.github.io/Interpretador-Compiladores/
 repo_url: https://github.com/an4catarina/Interpretador-Compiladores
 repo_name: Interpretador-Compiladores
 
+docs_dir: docs
+site_dir: site
+
 theme:
   name: material
   language: pt-BR
