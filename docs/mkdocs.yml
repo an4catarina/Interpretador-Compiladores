@@ -1,0 +1,54 @@
+site_name: Interpretador de C - Documentação
+site_url: https://an4catarina.github.io/Interpretador-Compiladores/
+repo_url: https://github.com/an4catarina/Interpretador-Compiladores
+repo_name: Interpretador-Compiladores
+
+docs_dir: .
+site_dir: ../site
+
+theme:
+  name: material
+  language: pt-BR
+  features:
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.top
+    - search.highlight
+    - search.share
+
+nav:
+  - Home: index.md
+  - Sprints:
+      - Organização e fluxo de trabalho: sprints/organizacao.md
+      - Planejamento: sprints/planejamento.md
+      - Sprint 1:
+          - Cronograma da sprint: sprints/sprint1/cronograma.md
+          - Descrição da Sprint: sprints/sprint1/desc_sprint1.md
+      - Sprint 2:
+          - Cronograma da sprint: sprints/sprint2/cronograma.md
+          - Descrição da Sprint: sprints/sprint2/desc_sprint2.md
+      - Sprint 3:
+          - Cronograma da sprint: sprints/sprint3/cronograma.md
+          - Descrição da Sprint: sprints/sprint3/desc_sprint3.md
+      - Sprint 4:
+          - Cronograma da sprint: sprints/sprint4/cronograma.md
+          - Descrição da Sprint: sprints/sprint4/desc_sprint4.md
+      - Sprint 5:
+          - Cronograma da sprint: sprints/sprint5/cronograma.md
+          - Descrição da Sprint: sprints/sprint5/desc_sprint5.md
+      - Sprint 6:
+          - Cronograma da sprint: sprints/sprint6/cronograma.md
+          - Descrição da Sprint: sprints/sprint6/desc_sprint6.md
+
+  - O interpretador:
+      - Como rodar o projeto: interpretador/comoRodar.md
+      - Glossário de termos: interpretador/glossarioTermos.md
+
+markdown_extensions:
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.superfences
+  - pymdownx.inlinehilite
+  - admonition
+  - pymdownx.details
+  - tables
